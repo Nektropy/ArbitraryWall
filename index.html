@@ -48,7 +48,7 @@
             background-repeat: repeat;
             background-size: 300px 300px;
             box-shadow: inset 0 0 0 4px #5a3f2e;
-            transform-origin: center;  /* 使用中心作为变换原点，便于缩放 */
+            transform-origin: 0 0;  /* 使用左上角作为变换原点，便于缩放 */
             will-change: transform;
             cursor: grab;
             transition: opacity 0.1s, cursor 0.1s;
@@ -66,8 +66,7 @@
             /* ===== 便签统一宽度/最小高度 (修改此处) ===== */
             width: 200px;                /* 修改宽度 */
             min-height: 180px;            /* 修改最小高度 */
-            background: #fffacd;
-            background: linear-gradient(145deg, #fff9e0, #ffefb0);
+            background-color: #fffacd; /* 各 style-* / has-image-bg 类会覆盖 */
             border-bottom: 4px solid #d4b57e;
             border-right: 4px solid #c7a36b;
             box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fffff0 inset;
@@ -77,7 +76,7 @@
             line-height: 1.5;
             color: #2d241b;
             border-radius: 5px 20px 12px 8px;
-            transform-origin: center;
+            transform-origin: 0 0;
             transition: box-shadow 0.1s, filter 0.1s;
             cursor: grab;
             word-wrap: break-word;
@@ -89,15 +88,31 @@
         
         /* 带图片背景的便签 */
         .note.has-image-bg {
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            background-color: #d6e8f5; /* 图片加载前/失败的降级色 */
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
             position: relative;
+        }
+        /* 图片加载失败时的提示 */
+        .note.has-image-bg.img-error {
+            background-color: #f0e8d8;
+            background-image: none !important;
+        }
+        .note.has-image-bg.img-error::after {
+            content: "🖼️";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            opacity: 0.3;
+            pointer-events: none;
         }
         
         /* 图片背景便签的内容覆盖层 */
         .note.has-image-bg .note-content {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.88);
             padding: 15px;
             border-radius: 4px;
             backdrop-filter: blur(3px);
@@ -106,8 +121,7 @@
         
         /* 便签样式 - yellow */
         .note.style-yellow {
-            background: #fffacd;
-            background: linear-gradient(145deg, #fff9e0, #ffefb0);
+            background-color: #fffacd; /* 各 style-* / has-image-bg 类会覆盖 */
             border-bottom: 4px solid #d4b57e;
             border-right: 4px solid #c7a36b;
             box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fffff0 inset;
@@ -475,17 +489,10 @@
 
             // Markdown 渲染 (使用 marked)
             function renderMarkdown(text) {
+                if (typeof marked === 'undefined') return text;
                 try {
-                    // 确保marked库已加载
-                    if (typeof marked === 'undefined') {
-                        console.error('Marked library not loaded');
-                        return text;
-                    }
-                    
-                    // 直接使用marked的基本功能，确保链接等元素正确渲染
                     return marked.parse(text);
                 } catch (e) {
-                    console.warn('Markdown解析失败', e);
                     return text;
                 }
             }
@@ -497,26 +504,31 @@
 
                 // 处理统一的style属性
                 if (typeof style === 'string') {
-                    // 检查style类型
-                    if (style.startsWith('http')) {
-                        // 图片背景
+                    if (style.startsWith('http') || style.startsWith('//')) {
+                        // ── 图片背景：用 Image 对象预加载，加载成功再设置，失败时降级 ──
                         note.classList.add('has-image-bg');
-                        // 直接设置背景图片，确保优先级
-                        note.style.background = `url(${style})`;
-                        note.style.backgroundSize = 'cover';
-                        note.style.backgroundPosition = 'center';
-                        note.style.backgroundRepeat = 'no-repeat';
+                        const img = new Image();
+                        img.onload = () => {
+                            // 加载成功：通过 style 属性直接设置，优先级高于 CSS
+                            note.style.setProperty('background-image', `url("${style}")`, 'important');
+                        };
+                        img.onerror = () => {
+                            // 加载失败：标记错误状态，显示降级样式
+                            note.classList.add('img-error');
+                        };
+                        // 设置跨域属性再赋 src，避免某些 CDN 的 CORS 问题
+                        img.crossOrigin = 'anonymous';
+                        img.src = style;
+                        // 若图片已在缓存中会同步触发 onload，此处无需额外处理
                     } else if (style.startsWith('#')) {
                         // 自定义颜色
                         note.classList.add('custom-color');
-                        note.style.background = style;
                         note.style.background = `linear-gradient(145deg, ${lightenColor(style, 5)}, ${darkenColor(style, 5)})`;
                     } else {
                         // 预设样式（使用颜色名字）
                         note.classList.add(`style-${style}`);
                     }
                 } else {
-                    // 默认样式
                     note.classList.add('style-yellow');
                 }
 
@@ -525,10 +537,10 @@
                 note.style.transform = `rotate(${rot}deg)`;
 
                 // 随机位置（如果未提供）
-                const randomLeft = left !== null ? left : random(200, WALL_WIDTH - 200);
-                const randomTop = top !== null ? top : random(200, WALL_HEIGHT - 200);
-                note.style.left = randomLeft + 'px';
-                note.style.top = randomTop + 'px';
+                const noteLeft = left !== null ? left : random(200, WALL_WIDTH - 200);
+                const noteTop  = top  !== null ? top  : random(200, WALL_HEIGHT - 200);
+                note.style.left = noteLeft + 'px';
+                note.style.top  = noteTop  + 'px';
 
                 const contentSpan = document.createElement('span');
                 contentSpan.className = 'note-content';
@@ -730,52 +742,17 @@
 
             // 初始化便签 (支持 Markdown、图片背景、颜色和样式)
             function initDefaultNotes(data = null) {
-                // 如果没有提供数据，使用默认数据
-                const defaultData = [
-                    { text: '**📌 重要提醒**\n- 会议今天下午3点\n- 记得带**笔记本**', style: 'yellow' },
-                    { text: '### 灵感 \n> 一万像素的愿景\n[参考链接](https://example.com)', style: 'blue' },
-                    { text: '`代码片段` 也可以\n```\nconst a = 1;\n```', style: 'green' },
-                    { text: '🍃 **风能进**，雨能进，*便签也能进*', style: 'red' },
-                    { text: '- 购物清单\n  - 牛奶\n  - 面包\n  - 马克笔', style: 'pink' },
-                    { text: '🎵 **无限大歌单**\n1. 夜曲\n2. 晴天', style: 'purple' },
-                    { text: '📖 读《景观社会》\n>  spectacle', style: 'yellow' },
-                    { text: '☕ **咖啡豆补货**\n*意式拼配*', style: 'blue' },
-                    { text: '💡 **灵光一闪**\n---\n新想法', style: 'orange' },
-                    { text: '📦 搬家纸箱\n~~易碎品~~', style: 'green' },
-                    { text: '🚀 **发射倒计时**\n`3...2...1...`', style: 'pink' },
-                    { text: '🔍 **寻找**小确幸', style: 'teal' },
-                    { text: '🏷️ **打折标签**\n- 5折', style: 'yellow' },
-                    { text: '📌 **!!!** 紧急', style: 'red' },
-                    { text: '🧩 拼图一角\n[图片](想象)', style: 'blue' },
-                    // 添加一个带图片背景的便签示例
-                    { text: '**🏖️ 度假计划**\n- 海滩\n- 阳光\n- 放松', style: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=300&h=200&auto=format&fit=crop' }
-                ];
-
-                // 检查数据结构，如果是新格式则从data.notes读取
-                const notesToProcess = data && data.notes ? data.notes : (data || defaultData);
-                
-                notesToProcess.forEach(item => {
-                    // 调用createNote函数，不传递left、top和rot参数，使用随机值
+                if (!data || !data.notes) return;
+                data.notes.forEach((item) => {
                     const note = createNote(
-                        item.text, 
+                        item.text,
                         null, // 随机位置
-                        null, // 随机位置
+                        null,
                         null, // 随机角度
-                        item.style || 'yellow' // 统一的style属性
+                        item.style || 'yellow'
                     );
                     wall.appendChild(note);
                 });
-
-                // 如果使用的是默认数据，添加额外的随机便签
-                if (!notesData) {
-                    for (let i = 0; i < 8; i++) {
-                        const text = `**便签 #${i+1}**  \n*随机位置*`;
-                        const styleOptions = ['yellow', 'blue', 'green', 'pink'];
-                        const randomStyle = styleOptions[Math.floor(random(0, styleOptions.length))];
-                        const note = createNote(text, null, null, null, randomStyle);
-                        wall.appendChild(note);
-                    }
-                }
             }
 
             // 设备检测
@@ -795,39 +772,64 @@
             });
 
             // ========== 缩放逻辑 (支持跟随光标，不出界) ==========
+            // 注意：wrapper.scrollLeft/scrollTop 工作在"缩放后像素"坐标系中。
+            // 墙经过 scale(s) 后，其实际占用宽度 = WALL_WIDTH * s，
+            // 所以 maxScrollLeft = WALL_WIDTH * s - vw，单位都是屏幕像素。
             function updateZoom(newScale, useCursor = false) {
-                // 获取当前视口尺寸
                 const vw = wrapper.clientWidth;
                 const vh = wrapper.clientHeight;
                 if (vw === 0 || vh === 0) return;
 
-                // 计算墙的中心点
-                const wallCenterX = WALL_WIDTH / 2;
-                const wallCenterY = WALL_HEIGHT / 2;
+                const oldScale = currentScale;
 
-                // 计算新的滚动位置，使墙中心与视口中心对齐
-                // 这个计算考虑了缩放因素
-                let newScrollLeft = wallCenterX - (vw / 2) / newScale;
-                let newScrollTop = wallCenterY - (vh / 2) / newScale;
+                // 缩放后墙的实际屏幕像素尺寸
+                const scaledW = WALL_WIDTH * newScale;
+                const scaledH = WALL_HEIGHT * newScale;
 
-                // 限制滚动范围，确保不会滚动到墙外面
-                const scaledWallWidth = WALL_WIDTH * newScale;
-                const scaledWallHeight = WALL_HEIGHT * newScale;
-                
-                if (scaledWallWidth > vw) {
-                    const maxScrollLeft = WALL_WIDTH - vw / newScale;
+                // 确定"锚点"：缩放前后该点在屏幕上保持不动
+                // focusX/Y 是视口内的屏幕坐标（像素）
+                let focusX, focusY;
+                if (useCursor && !mobileDevice) {
+                    focusX = cursorPos.x;
+                    focusY = cursorPos.y;
+                } else {
+                    // 以视口中心为锚点
+                    focusX = vw / 2;
+                    focusY = vh / 2;
+                }
+
+                // 锚点在缩放前墙面上的绝对位置（墙坐标系，单位：墙像素）
+                // 当前 scrollLeft/Top 是屏幕像素，除以 oldScale 得到墙坐标
+                const anchorWallX = (wrapper.scrollLeft + focusX) / oldScale;
+                const anchorWallY = (wrapper.scrollTop + focusY) / oldScale;
+
+                // 缩放后，为了让锚点仍位于屏幕上同一位置，新的 scrollLeft/Top：
+                let newScrollLeft = anchorWallX * newScale - focusX;
+                let newScrollTop  = anchorWallY * newScale - focusY;
+
+                // 限制滚动范围，确保不会超出墙面边界
+                // 最大滚动 = 缩放后墙尺寸 - 视口尺寸；若墙比视口小则居中
+                const maxScrollLeft = Math.max(0, scaledW - vw);
+                const maxScrollTop  = Math.max(0, scaledH - vh);
+
+                if (scaledW <= vw) {
+                    // 墙比视口窄时水平居中
+                    newScrollLeft = -(vw - scaledW) / 2;
+                } else {
                     newScrollLeft = Math.max(0, Math.min(maxScrollLeft, newScrollLeft));
                 }
-                
-                if (scaledWallHeight > vh) {
-                    const maxScrollTop = WALL_HEIGHT - vh / newScale;
+
+                if (scaledH <= vh) {
+                    // 墙比视口矮时垂直居中
+                    newScrollTop = -(vh - scaledH) / 2;
+                } else {
                     newScrollTop = Math.max(0, Math.min(maxScrollTop, newScrollTop));
                 }
 
-                // 应用缩放和滚动
+                // 应用缩放，然后设置滚动（顺序很重要）
                 wall.style.transform = `scale(${newScale})`;
                 wrapper.scrollLeft = newScrollLeft;
-                wrapper.scrollTop = newScrollTop;
+                wrapper.scrollTop  = newScrollTop;
 
                 // 更新当前缩放值
                 currentScale = newScale;
@@ -837,45 +839,44 @@
             // 滑块事件
             slider.addEventListener('input', (e) => {
                 const newScale = parseFloat(e.target.value);
-                updateZoom(newScale); // 滑块使用中心缩放
+                updateZoom(newScale, !mobileDevice); // 根据设备类型决定是否使用光标跟随缩放
             });
 
             // 初始缩放与滚动 (使墙中间区域可见)
-            window.addEventListener('load', () => {
+            window.addEventListener('load', async () => {
                 makeWallDraggable(); // 启用墙面拖动功能
 
-                // 加载外部便签数据
-                fetch('notes-data.json')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Failed to load notes data');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        initDefaultNotes(data);
-                    })
-                    .catch(error => {
-                        console.error('Error loading notes data:', error);
-                        // 加载失败时使用默认数据
-                        initDefaultNotes();
-                    })
-                    .finally(() => {
-                        // 设置初始缩放为1，并滚动到大致中心 (4000,4000)
-                        setTimeout(() => {
-                            const vw = wrapper.clientWidth;
-                            const vh = wrapper.clientHeight;
-                            const targetScrollLeft = 4000 - vw/2;
-                            const targetScrollTop = 4000 - vh/2;
-                            wrapper.scrollLeft = Math.max(0, Math.min(10000 - vw, targetScrollLeft));
-                            wrapper.scrollTop = Math.max(0, Math.min(10000 - vh, targetScrollTop));
+                // 加载外部便签数据，添加时间戳参数确保获取最新版本
+                try {
+                    const response = await fetch(`notes-data.json?t=${Date.now()}`);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const data = await response.json();
+                    initDefaultNotes(data);
+                } catch (error) {
+                    console.warn('无法加载便签数据:', error.message);
+                }
+                
+                // 设置初始缩放为1，并滚动到墙面中心
+                setTimeout(() => {
+                    const vw = wrapper.clientWidth;
+                    const vh = wrapper.clientHeight;
 
-                            // 确保滑块与缩放同步
-                            slider.value = currentScale;
-                            zoomSpan.innerText = Math.round(currentScale * 100) + '%';
-                            updateZoom(currentScale);
-                        }, 100); // 稍等确保布局完成
-                    });
+                    // 确保滑块与缩放同步
+                    slider.value = currentScale;
+                    zoomSpan.innerText = Math.round(currentScale * 100) + '%';
+
+                    // 缩放后墙的屏幕像素尺寸（scale=1 时等于墙尺寸）
+                    const scaledW = WALL_WIDTH * currentScale;
+                    const scaledH = WALL_HEIGHT * currentScale;
+
+                    // 让墙面中心对准视口中心（缩放后像素坐标系）
+                    const targetScrollLeft = (scaledW / 2) - (vw / 2);
+                    const targetScrollTop  = (scaledH / 2) - (vh / 2);
+
+                    wall.style.transform = `scale(${currentScale})`;
+                    wrapper.scrollLeft = Math.max(0, Math.min(scaledW - vw, targetScrollLeft));
+                    wrapper.scrollTop  = Math.max(0, Math.min(scaledH - vh, targetScrollTop));
+                }, 100);
             });
 
             // 墙面拖动功能
@@ -936,13 +937,13 @@
                     const dx = clientX - startX;
                     const dy = clientY - startY;
 
-                    // 计算新的滚动位置
-                    const newScrollLeft = initialScrollLeft - dx / currentScale;
-                    const newScrollTop = initialScrollTop - dy / currentScale;
+                    // scrollLeft/Top 在屏幕像素坐标系，鼠标移动量 dx/dy 也是屏幕像素，直接相减即可
+                    const newScrollLeft = initialScrollLeft - dx;
+                    const newScrollTop  = initialScrollTop  - dy;
 
                     // 应用滚动位置
                     wrapper.scrollLeft = newScrollLeft;
-                    wrapper.scrollTop = newScrollTop;
+                    wrapper.scrollTop  = newScrollTop;
                 }
 
                 function onDragEnd(e) {
@@ -985,6 +986,10 @@
             wrapper.addEventListener('wheel', (e) => {
                 e.preventDefault();
                 
+                // 更新光标位置
+                cursorPos.x = e.clientX;
+                cursorPos.y = e.clientY;
+                
                 // 计算缩放增量，根据滚轮方向
                 const delta = e.deltaY > 0 ? -0.05 : 0.05;
                 let newScale = currentScale + delta;
@@ -995,8 +1000,8 @@
                 // 更新滑块值
                 slider.value = newScale;
                 
-                // 滑块使用中心缩放
-                updateZoom(newScale);
+                // 根据设备类型决定是否使用光标跟随缩放
+                updateZoom(newScale, !mobileDevice);
             });
 
             // 触摸设备双指缩放支持
@@ -1047,17 +1052,15 @@
             // 窗口resize时，可能需要调整滚动边界 (保持中心点？为了简化，不做额外处理，但可保持缩放不变)
             // 可选：resize 时重新限制滚动边界，但无需更改缩放。
             window.addEventListener('resize', () => {
-                // 保证滚动位置不越界
+                // 保证滚动位置不越界（坐标系：缩放后屏幕像素）
                 const vw = wrapper.clientWidth;
                 const vh = wrapper.clientHeight;
-                const maxLeft = WALL_WIDTH - vw;
-                const maxTop = WALL_HEIGHT - vh;
-                let sl = wrapper.scrollLeft;
-                let st = wrapper.scrollTop;
-                sl = Math.max(0, Math.min(maxLeft, sl));
-                st = Math.max(0, Math.min(maxTop, st));
-                wrapper.scrollLeft = sl;
-                wrapper.scrollTop = st;
+                const scaledW = WALL_WIDTH * currentScale;
+                const scaledH = WALL_HEIGHT * currentScale;
+                const maxLeft = Math.max(0, scaledW - vw);
+                const maxTop  = Math.max(0, scaledH - vh);
+                wrapper.scrollLeft = Math.max(0, Math.min(maxLeft, wrapper.scrollLeft));
+                wrapper.scrollTop  = Math.max(0, Math.min(maxTop,  wrapper.scrollTop));
             });
         })();
     </script>
