@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>任意墙 · 中心缩放 · 右下滑块</title>
+    <title>便签投稿墙</title>
     <!-- 使用 marked 解析 Markdown (轻量, 安全) -->
     <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
     <style>
@@ -64,16 +64,15 @@
         /* 便签统一样式 — 尺寸可修改 */
         .note {
             position: absolute;
-            /* ===== 便签统一宽度/最小高度 (修改此处) ===== */
-            width: 200px;                /* 修改宽度 */
-            min-height: 180px;            /* 修改最小高度 */
-            background-color: #fffacd; /* 各 style-* / has-image-bg 类会覆盖 */
+            width: 240px;
+            min-height: 200px;
+            background-color: #fffacd;
             border-bottom: 4px solid #d4b57e;
             border-right: 4px solid #c7a36b;
             box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fffff0 inset;
-            padding: 20px 15px 15px 20px;
+            padding: 18px 16px 14px 20px;
             font-family: 'Segoe UI', 'Comic Sans MS', 'Marker Felt', cursive;
-            font-size: 1rem;
+            font-size: 0.95rem;
             line-height: 1.5;
             color: #2d241b;
             border-radius: 5px 20px 12px 8px;
@@ -84,7 +83,7 @@
             z-index: 1;
             will-change: left, top;
             overflow: hidden;
-            touch-action: none; /* 让拖拽自己处理触摸事件 */
+            touch-action: none;
         }
         
         /* 带图片背景的便签 */
@@ -261,7 +260,6 @@
         .note-content {
             display: block;
             width: 100%;
-            height: 100%;
             white-space: normal;
             word-break: break-word;
         }
@@ -322,6 +320,23 @@
             color: #a55808;
             text-decoration: underline;
             cursor: pointer;
+        }
+
+
+        /* 便签署名 */
+        .note-author {
+            display: block;
+            margin-top: 10px;
+            padding-top: 7px;
+            border-top: 1px dashed rgba(0,0,0,0.15);
+            font-size: 0.75rem;
+            color: rgba(60,40,20,0.6);
+            text-align: right;
+            font-style: italic;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         /* 缩放控制条 — 右下角固定，移动端友好 */
@@ -494,24 +509,25 @@
     <!-- 缩放滑块 (右下角) -->
     <div class="zoom-control">
         <label>🔍</label>
-        <input type="range" id="zoomSlider" min="0.4" max="3" step="0.02" value="1">
+        <input type="range" id="zoomSlider" min="0.2" max="3" step="0.02" value="1">
         <span id="zoomPercent">100%</span>
     </div>
 
     <!-- 弹窗 (使用说明) -->
     <div class="modal-overlay" id="infoModal">
         <div class="modal-box">
-            <h2>🧱 任意墙 · 中心缩放版</h2>
+            <h2>🧱 便签投稿墙</h2>
             <ul>
-                <li><strong>📐 便签尺寸</strong>：修改 <code>.note</code> 中的 <code>width</code> 和 <code>min-height</code> 数值。</li>
-                <li><strong>🖼️ 背景图片</strong>：修改 <code>.wall</code> 中的 <code>background-image</code> 链接。</li>
-                <li><strong>📝 Markdown</strong>：便签内容已支持 Markdown (如 **粗体**、- 列表、[链接] 等)。</li>
-                <li><strong>➕ 添加便签</strong>：在 <code>initDefaultNotes()</code> 的 <code>notesData</code> 数组里追加新对象。</li>
-                <li><strong>🔍 中心缩放</strong>：滑块缩放始终以屏幕中心为基准，不会“跑出墙外”。</li>
-                <li><strong>📱 多端适配</strong>：滑块右下角，移动端触摸友好。</li>
+                <li><strong>➕ 添加投稿</strong>：在 <code>notes-data.json</code> 的 <code>notes</code> 数组追加新对象。</li>
+                <li><strong>👤 署名字段</strong>：<code>author</code>（昵称）、<code>avatar</code>（头像链接）、<code>from</code>（来源平台）。</li>
+                <li><strong>🎨 便签颜色</strong>：<code>style</code> 填颜色名（yellow/blue…）、<code>#hex</code> 或图片链接。</li>
+                <li><strong>📝 支持 Markdown</strong>：粗体、斜体、列表、链接、代码块均可用。</li>
+                <li><strong>🔍 缩放</strong>：右下角滑块 / 鼠标滚轮 / 移动端双指。</li>
+                <li><strong>🖱️ 拖动</strong>：单指/鼠标拖动墙面，便签也可单独拖拽。</li>
             </ul>
-            <button class="modal-close" id="closeModalBtn">开始体验</button>
+            <button class="modal-close" id="closeModalBtn">开始探索 🚀</button>
         </div>
+    </div>
     </div>
 
     <script>
@@ -535,6 +551,21 @@
             // 工具函数：随机范围
             const random = (min, max) => Math.random() * (max - min) + min;
 
+            // 字数限制（含 Markdown 标记符，按可见字符计）
+            const MAX_CHARS = 100;
+            function truncateText(text) {
+                if (!text) return '';
+                // 剥离 Markdown 标记估算可见字符数
+                const visible = text
+                    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1') // 链接/图片
+                    .replace(/(`{1,3})[^`]*/g, '')           // 代码
+                    .replace(/#{1,6}\s*/g, '')                  // 标题
+                    .replace(/[*_~`>]+/g, '');                  // 强调/引用
+                if (visible.length <= MAX_CHARS) return text;
+                // 按原始文本截断，留余量给 Markdown 符号
+                return text.slice(0, Math.round(MAX_CHARS * 1.4)) + '…';
+            }
+
             // Markdown 渲染 (使用 marked)
             function renderMarkdown(text) {
                 if (typeof marked === 'undefined') return text;
@@ -545,57 +576,54 @@
                 }
             }
 
-            // 创建便签 (支持统一的style属性)
-            function createNote(mdText, left, top, rotate = null, style = 'yellow') {
+            // 创建便签（支持 style：颜色名 / #hex / 图片链接，以及可选 author 署名）
+            function createNote(mdText, left, top, rotate = null, style = 'yellow', author = '') {
                 const note = document.createElement('div');
                 note.className = 'note';
 
-                // 处理统一的style属性
+                // ── 背景样式 ──
                 if (typeof style === 'string') {
                     if (style.startsWith('http') || style.startsWith('//')) {
-                        // ── 图片背景：用 Image 对象预加载，加载成功再设置，失败时降级 ──
                         note.classList.add('has-image-bg');
                         const img = new Image();
                         img.onload = () => {
-                            // 加载成功：通过 style 属性直接设置，优先级高于 CSS
                             note.style.setProperty('background-image', `url("${style}")`, 'important');
                         };
-                        img.onerror = () => {
-                            // 加载失败：标记错误状态，显示降级样式
-                            note.classList.add('img-error');
-                        };
-                        // 设置跨域属性再赋 src，避免某些 CDN 的 CORS 问题
+                        img.onerror = () => note.classList.add('img-error');
                         img.crossOrigin = 'anonymous';
                         img.src = style;
-                        // 若图片已在缓存中会同步触发 onload，此处无需额外处理
                     } else if (style.startsWith('#')) {
-                        // 自定义颜色
                         note.classList.add('custom-color');
                         note.style.background = `linear-gradient(145deg, ${lightenColor(style, 5)}, ${darkenColor(style, 5)})`;
                     } else {
-                        // 预设样式（使用颜色名字）
                         note.classList.add(`style-${style}`);
                     }
                 } else {
                     note.classList.add('style-yellow');
                 }
 
-                // 随机角度（如果未提供）
+                // ── 旋转 & 位置 ──
                 const rot = (rotate !== null) ? rotate : random(-5, 6);
                 note.style.transform = `rotate(${rot}deg)`;
-
-                // 随机位置（如果未提供）
                 const noteLeft = left !== null ? left : random(200, WALL_WIDTH - 200);
                 const noteTop  = top  !== null ? top  : random(200, WALL_HEIGHT - 200);
                 note.style.left = noteLeft + 'px';
                 note.style.top  = noteTop  + 'px';
+                note.style.zIndex = Math.floor(random(10, 500));
 
+                // ── 正文内容 ──
                 const contentSpan = document.createElement('span');
                 contentSpan.className = 'note-content';
-                contentSpan.innerHTML = renderMarkdown(mdText);
+                contentSpan.innerHTML = renderMarkdown(truncateText(mdText));
                 note.appendChild(contentSpan);
 
-                note.style.zIndex = Math.floor(random(10, 500));
+                // ── 署名（有 author 时显示）──
+                if (author && author.trim()) {
+                    const authorEl = document.createElement('span');
+                    authorEl.className = 'note-author';
+                    authorEl.textContent = '— ' + author.trim();
+                    note.appendChild(authorEl);
+                }
 
                 makeDraggable(note);
                 return note;
@@ -788,16 +816,15 @@
                 element.addEventListener('touchstart', onDragStart, { passive: false });
             }
 
-            // 初始化便签 (支持 Markdown、图片背景、颜色和样式)
+            // 初始化便签
             function initDefaultNotes(data = null) {
                 if (!data || !data.notes) return;
                 data.notes.forEach((item) => {
                     const note = createNote(
                         item.text,
-                        null, // 随机位置
-                        null,
-                        null, // 随机角度
-                        item.style || 'yellow'
+                        null, null, null,
+                        item.style  || 'yellow',
+                        item.author || ''
                     );
                     wall.appendChild(note);
                 });
@@ -1033,7 +1060,7 @@
 
                         const dist = getTouchDist(e.touches);
                         let newScale = pinchInitScale * (dist / pinchInitDist);
-                        newScale = Math.max(0.4, Math.min(3, newScale));
+                        newScale = Math.max(0.2, Math.min(3, newScale));
 
                         // 以双指中点为缩放锚点
                         const mid = getTouchMidpoint(e.touches);
@@ -1117,7 +1144,7 @@
                 let newScale = currentScale + delta;
                 
                 // 限制缩放范围
-                newScale = Math.max(0.4, Math.min(3, newScale));
+                newScale = Math.max(0.2, Math.min(3, newScale));
                 
                 // 更新滑块值
                 slider.value = newScale;
