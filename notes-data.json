@@ -1,7 +1,3 @@
-// style属性使用说明：
-// 1. 预设颜色：yellow, blue, green, pink, red, purple, orange, teal, indigo, lime, cyan, amber
-// 2. 自定义颜色：以#开头的十六进制颜色值，如 #ff9999
-// 3. 图片背景：以http开头的图片链接，如 https://example.com/image.jpg
 {
   "notes": [
     {
