@@ -1,0 +1,80 @@
+// style属性使用说明：
+// 1. 预设颜色：yellow, blue, green, pink, red, purple, orange, teal, indigo, lime, cyan, amber
+// 2. 自定义颜色：以#开头的十六进制颜色值，如 #ff9999
+// 3. 图片背景：以http开头的图片链接，如 https://example.com/image.jpg
+{
+  "notes": [
+    {
+      "text": "**📌 重要提醒**\n- 会议今天下午3点\n- 记得带**笔记本**\n[会议链接](https://meeting.example.com)",
+      "style": "yellow"
+    },
+    {
+      "text": "### 灵感 \n> 一万像素的愿景\n[参考链接](https://example.com)\n[文档链接](https://docs.example.com)",
+      "style": "blue"
+    },
+    {
+      "text": "`代码片段` 也可以\n```\nconst a = 1;\n```\n[代码仓库](https://github.com/example)",
+      "style": "green"
+    },
+    {
+      "text": "🍃 **风能进**，雨能进，*便签也能进*\n[环保链接](https://eco.example.com)",
+      "style": "red"
+    },
+    {
+      "text": "- 购物清单\n  - 牛奶\n  - 面包\n  - 马克笔\n[购物网站](https://shop.example.com)",
+      "style": "pink"
+    },
+    {
+      "text": "🎵 **无限大歌单**\n1. 夜曲\n2. 晴天\n[音乐平台](https://music.example.com)",
+      "style": "purple"
+    },
+    {
+      "text": "📖 读《景观社会》\n>  spectacle\n[书籍链接](https://book.example.com)",
+      "style": "yellow"
+    },
+    {
+      "text": "☕ **咖啡豆补货**\n*意式拼配*\n[咖啡商店](https://coffee.example.com)",
+      "style": "blue"
+    },
+    {
+      "text": "💡 **灵光一闪**\n---\n新想法\n[创意平台](https://idea.example.com)",
+      "style": "orange"
+    },
+    {
+      "text": "📦 搬家纸箱\n~~易碎品~~\n[搬家服务](https://moving.example.com)",
+      "style": "green"
+    },
+    {
+      "text": "🚀 **发射倒计时**\n`3...2...1...`\n[太空探索](https://space.example.com)",
+      "style": "pink"
+    },
+    {
+      "text": "🔍 **寻找**小确幸\n[生活方式](https://lifestyle.example.com)",
+      "style": "teal"
+    },
+    {
+      "text": "🏷️ **打折标签**\n- 5折\n[折扣网站](https://discount.example.com)",
+      "style": "yellow"
+    },
+    {
+      "text": "📌 **!!!** 紧急\n[紧急联系人](https://emergency.example.com)",
+      "style": "red"
+    },
+    {
+      "text": "🧩 拼图一角\n[图片素材](https://images.example.com)",
+      "style": "https://www.nekt.qzz.io/head.png"
+    },
+    {
+      "text": "**🏖️ 度假计划**\n- 海滩\n- 阳光\n- 放松\n[旅行网站](https://travel.example.com)",
+      "style": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=300&h=200&auto=format&fit=crop"
+    }
+  ],
+  "styleGuide": {
+    "description": "style属性可以是以下值之一",
+    "options": {
+      "presetColors": ["yellow", "blue", "green", "pink", "red", "purple", "orange", "teal", "indigo", "lime", "cyan", "amber"],
+      "customColor": "以#开头的十六进制颜色值，如 #ff9999",
+      "imageUrl": "以http开头的图片链接，如 https://example.com/image.jpg"
+    }
+  }
+}
