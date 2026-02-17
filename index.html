@@ -19,7 +19,7 @@
             overflow: hidden;
             height: 100vh;
             width: 100vw;
-            touch-action: pan-x pan-y; /* 保留双指手势但不影响滑块 */
+            touch-action: pan-x pan-y pinch-zoom; /* 允许单指平移 + 双指缩放 */
         }
 
         /* 全屏滚动容器 */
@@ -28,6 +28,7 @@
             height: 100vh;
             overflow: auto;
             position: relative;
+            touch-action: none; /* JS 完整接管所有触摸手势（单指拖动 + 双指缩放） */
             /* 蓝天背景，缩小时显示美观的外界 */
             background: linear-gradient(to bottom, #87ceeb, #b0e0e6);
             -webkit-overflow-scrolling: touch; /* 流畅滚动 */
@@ -926,96 +927,170 @@
                 }, 100);
             });
 
-            // 墙面拖动功能
+            // ── 墙面手势管理器：统一处理单指拖动 + 双指缩放 ──
             function makeWallDraggable() {
-                let isDragging = false;
-                let startX, startY;
-                let initialScrollLeft, initialScrollTop;
 
-                function onDragStart(e) {
-                    // 只有点击墙面空白区域才触发拖动
+                // ── 鼠标拖动（桌面端）──
+                let mouseDown = false;
+                let mouseStartX, mouseStartY, mouseInitSL, mouseInitST;
+
+                function onMouseDown(e) {
                     if (e.target === wall || e.target === wrapper) {
-                        if (e.button !== undefined && e.button !== 0) return;
+                        if (e.button !== 0) return;
                         e.preventDefault();
-                        e.stopPropagation();
+                        mouseDown = true;
+                        mouseStartX = e.clientX;
+                        mouseStartY = e.clientY;
+                        mouseInitSL = wrapper.scrollLeft;
+                        mouseInitST = wrapper.scrollTop;
+                        document.addEventListener('mousemove', onMouseMove);
+                        document.addEventListener('mouseup', onMouseUp);
+                    }
+                }
+                function onMouseMove(e) {
+                    if (!mouseDown) return;
+                    wrapper.scrollLeft = mouseInitSL - (e.clientX - mouseStartX);
+                    wrapper.scrollTop  = mouseInitST  - (e.clientY - mouseStartY);
+                }
+                function onMouseUp() {
+                    mouseDown = false;
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                }
+                wall.addEventListener('mousedown', onMouseDown);
+                wrapper.addEventListener('mousedown', onMouseDown);
 
-                        let clientX, clientY;
-                        if (e.type === 'mousedown') {
-                            clientX = e.clientX;
-                            clientY = e.clientY;
-                        } else if (e.type === 'touchstart') {
-                            clientX = e.touches[0].clientX;
-                            clientY = e.touches[0].clientY;
-                        } else {
+                // ── 触摸手势（移动端）：单指拖动 + 双指 pinch 缩放 ──
+                // 状态机：idle → drag(1finger) / pinch(2finger)
+                let touchState = 'idle'; // 'idle' | 'drag' | 'pinch'
+                let dragStartX, dragStartY, dragInitSL, dragInitST;
+                let pinchInitDist, pinchInitScale, pinchInitMidX, pinchInitMidY;
+                let pinchInitSL, pinchInitST;
+
+                function getTouchMidpoint(touches) {
+                    return {
+                        x: (touches[0].clientX + touches[1].clientX) / 2,
+                        y: (touches[0].clientY + touches[1].clientY) / 2,
+                    };
+                }
+                function getTouchDist(touches) {
+                    const dx = touches[1].clientX - touches[0].clientX;
+                    const dy = touches[1].clientY - touches[0].clientY;
+                    return Math.sqrt(dx * dx + dy * dy);
+                }
+
+                function onTouchStart(e) {
+                    // 如果触摸起点在 zoom-control 内，忽略（让滑块自己处理）
+                    if (e.target.closest && e.target.closest('.zoom-control')) return;
+
+                    if (e.touches.length === 1) {
+                        // 只响应墙面/容器区域的单指
+                        if (e.target === wall || e.target === wrapper) {
+                            e.preventDefault();
+                            touchState = 'drag';
+                            dragStartX = e.touches[0].clientX;
+                            dragStartY = e.touches[0].clientY;
+                            dragInitSL = wrapper.scrollLeft;
+                            dragInitST = wrapper.scrollTop;
+                        }
+                    } else if (e.touches.length === 2) {
+                        // 双指：无论从哪里落下都进入 pinch 模式，覆盖之前的拖动
+                        e.preventDefault();
+                        touchState = 'pinch';
+                        pinchInitDist  = getTouchDist(e.touches);
+                        pinchInitScale = currentScale;
+                        const mid = getTouchMidpoint(e.touches);
+                        pinchInitMidX = mid.x;
+                        pinchInitMidY = mid.y;
+                        pinchInitSL = wrapper.scrollLeft;
+                        pinchInitST = wrapper.scrollTop;
+                    }
+                }
+
+                function onTouchMove(e) {
+                    if (touchState === 'idle') return;
+                    e.preventDefault();
+
+                    if (touchState === 'drag' && e.touches.length === 1) {
+                        const dx = e.touches[0].clientX - dragStartX;
+                        const dy = e.touches[0].clientY - dragStartY;
+                        wrapper.scrollLeft = dragInitSL - dx;
+                        wrapper.scrollTop  = dragInitST  - dy;
+
+                    } else if (e.touches.length === 2) {
+                        // 如果中途变为双指，升级为 pinch
+                        if (touchState !== 'pinch') {
+                            touchState = 'pinch';
+                            pinchInitDist  = getTouchDist(e.touches);
+                            pinchInitScale = currentScale;
+                            const mid = getTouchMidpoint(e.touches);
+                            pinchInitMidX = mid.x;
+                            pinchInitMidY = mid.y;
+                            pinchInitSL = wrapper.scrollLeft;
+                            pinchInitST = wrapper.scrollTop;
                             return;
                         }
 
-                        startX = clientX;
-                        startY = clientY;
-                        initialScrollLeft = wrapper.scrollLeft;
-                        initialScrollTop = wrapper.scrollTop;
+                        const dist = getTouchDist(e.touches);
+                        let newScale = pinchInitScale * (dist / pinchInitDist);
+                        newScale = Math.max(0.4, Math.min(3, newScale));
 
-                        isDragging = true;
+                        // 以双指中点为缩放锚点
+                        const mid = getTouchMidpoint(e.touches);
+                        const oldScale = currentScale;
 
-                        document.addEventListener('mousemove', onDragMove);
-                        document.addEventListener('mouseup', onDragEnd);
-                        document.addEventListener('touchmove', onDragMove, { passive: false });
-                        document.addEventListener('touchend', onDragEnd);
-                        document.addEventListener('touchcancel', onDragCancel);
+                        // 锚点在墙坐标系的位置（用缩放前 scroll + 初始中点计算）
+                        const anchorWallX = (pinchInitSL + pinchInitMidX) / pinchInitScale;
+                        const anchorWallY = (pinchInitST  + pinchInitMidY) / pinchInitScale;
+
+                        // 新 scroll：让同一墙坐标点对齐到当前中点屏幕位置
+                        let newSL = anchorWallX * newScale - mid.x;
+                        let newST = anchorWallY * newScale - mid.y;
+
+                        const scaledW = WALL_WIDTH  * newScale;
+                        const scaledH = WALL_HEIGHT * newScale;
+                        const vw = wrapper.clientWidth;
+                        const vh = wrapper.clientHeight;
+                        newSL = Math.max(0, Math.min(Math.max(0, scaledW - vw), newSL));
+                        newST = Math.max(0, Math.min(Math.max(0, scaledH - vh), newST));
+
+                        wall.style.transform = `scale(${newScale})`;
+                        wrapper.scrollLeft = newSL;
+                        wrapper.scrollTop  = newST;
+                        currentScale = newScale;
+                        slider.value = newScale;
+                        zoomSpan.innerText = Math.round(newScale * 100) + '%';
                     }
                 }
 
-                function onDragMove(e) {
-                    if (!isDragging) return;
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    let clientX, clientY;
-                    if (e.type === 'mousemove') {
-                        clientX = e.clientX;
-                        clientY = e.clientY;
-                    } else if (e.type === 'touchmove') {
-                        clientX = e.touches[0].clientX;
-                        clientY = e.touches[0].clientY;
-                    } else {
-                        return;
+                function onTouchEnd(e) {
+                    if (e.touches.length === 0) {
+                        touchState = 'idle';
+                    } else if (e.touches.length === 1 && touchState === 'pinch') {
+                        // 从双指变回单指：重置拖动起点，平滑切换
+                        touchState = 'drag';
+                        dragStartX = e.touches[0].clientX;
+                        dragStartY = e.touches[0].clientY;
+                        dragInitSL = wrapper.scrollLeft;
+                        dragInitST = wrapper.scrollTop;
                     }
-
-                    const dx = clientX - startX;
-                    const dy = clientY - startY;
-
-                    // scrollLeft/Top 在屏幕像素坐标系，鼠标移动量 dx/dy 也是屏幕像素，直接相减即可
-                    const newScrollLeft = initialScrollLeft - dx;
-                    const newScrollTop  = initialScrollTop  - dy;
-
-                    // 应用滚动位置
-                    wrapper.scrollLeft = newScrollLeft;
-                    wrapper.scrollTop  = newScrollTop;
                 }
 
-                function onDragEnd(e) {
-                    if (!isDragging) return;
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    document.removeEventListener('mousemove', onDragMove);
-                    document.removeEventListener('mouseup', onDragEnd);
-                    document.removeEventListener('touchmove', onDragMove);
-                    document.removeEventListener('touchend', onDragEnd);
-                    document.removeEventListener('touchcancel', onDragCancel);
-                    isDragging = false;
-                }
-
-                function onDragCancel(e) {
-                    onDragEnd(e);
-                }
-
-                // 添加事件监听器到墙面和容器
-                wall.addEventListener('mousedown', onDragStart);
-                wall.addEventListener('touchstart', onDragStart, { passive: false });
-                wrapper.addEventListener('mousedown', onDragStart);
-                wrapper.addEventListener('touchstart', onDragStart, { passive: false });
+                wrapper.addEventListener('touchstart', onTouchStart, { passive: false });
+                wall.addEventListener('touchstart',    onTouchStart, { passive: false });
+                // move/end 挂在 document，避免手指划出 wrapper 时丢失事件
+                document.addEventListener('touchmove', onTouchMove, { passive: false });
+                document.addEventListener('touchend',  onTouchEnd,  { passive: true });
+                document.addEventListener('touchcancel', onTouchEnd, { passive: true });
             }
+
+            // zoom-control 阻止触摸事件冒泡到 wrapper（防止滑块操作触发墙面拖动）
+            document.querySelector('.zoom-control').addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+            }, { passive: true });
+            document.querySelector('.zoom-control').addEventListener('touchmove', (e) => {
+                e.stopPropagation();
+            }, { passive: true });
 
             // 弹窗控制
             const modal = document.getElementById('infoModal');
@@ -1051,50 +1126,7 @@
                 updateZoom(newScale, !mobileDevice);
             });
 
-            // 触摸设备双指缩放支持
-            let initialDistance = 0;
-            let initialScale = 1;
-            
-            function handleTouchStart(e) {
-                if (e.touches.length === 2) {
-                    // 计算初始双指距离
-                    initialDistance = getDistance(e.touches[0], e.touches[1]);
-                    initialScale = currentScale;
-                }
-            }
-            
-            function handleTouchMove(e) {
-                if (e.touches.length === 2) {
-                    e.preventDefault();
-                    
-                    // 计算当前双指距离
-                    const currentDistance = getDistance(e.touches[0], e.touches[1]);
-                    
-                    // 计算缩放比例
-                    const scaleFactor = currentDistance / initialDistance;
-                    let newScale = initialScale * scaleFactor;
-                    
-                    // 限制缩放范围
-                    newScale = Math.max(0.4, Math.min(3, newScale));
-                    
-                    // 更新滑块值
-                    slider.value = newScale;
-                    
-                    // 应用缩放
-                    updateZoom(newScale);
-                }
-            }
-            
-            // 计算两点之间的距离
-            function getDistance(touch1, touch2) {
-                const dx = touch2.clientX - touch1.clientX;
-                const dy = touch2.clientY - touch1.clientY;
-                return Math.sqrt(dx * dx + dy * dy);
-            }
-            
-            // 添加触摸事件监听器
-            wrapper.addEventListener('touchstart', handleTouchStart, { passive: true });
-            wrapper.addEventListener('touchmove', handleTouchMove, { passive: false });
+            // 双指缩放已整合至 makeWallDraggable() 的统一手势管理器
 
             // 窗口resize时，可能需要调整滚动边界 (保持中心点？为了简化，不做额外处理，但可保持缩放不变)
             // 可选：resize 时重新限制滚动边界，但无需更改缩放。
