@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>便签投稿墙</title>
     <!-- 使用 marked 解析 Markdown (轻量, 安全) -->
-    <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js" defer></script>
     <style>
         * {
             box-sizing: border-box;
@@ -52,11 +52,9 @@
             transform-origin: 0 0;  /* 使用左上角作为变换原点，便于缩放 */
             will-change: transform;
             cursor: grab;
-            transition: opacity 0.1s, cursor 0.1s;
         }
         .wall:active {
             cursor: grabbing;
-            opacity: 0.95;
         }
         
 
@@ -70,7 +68,7 @@
             border-bottom: 4px solid #d4b57e;
             border-right: 4px solid #c7a36b;
             box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fffff0 inset;
-            padding: 18px 16px 14px 20px;
+            padding: 18px 16px 32px 20px;  /* bottom 留给署名行 */
             font-family: 'Segoe UI', 'Comic Sans MS', 'Marker Felt', cursive;
             font-size: 0.95rem;
             line-height: 1.5;
@@ -81,9 +79,10 @@
             cursor: grab;
             word-wrap: break-word;
             z-index: 1;
-            will-change: left, top;
+            will-change: transform;  /* 改为 transform，拖动用 translate */
             overflow: hidden;
             touch-action: none;
+            contain: layout style;   /* 隔离 reflow 影响 */
         }
         
         /* 带图片背景的便签 */
@@ -323,20 +322,24 @@
         }
 
 
-        /* 便签署名 */
+        /* 便签署名 — 绝对定位固定于右下角 */
         .note-author {
-            display: block;
-            margin-top: 10px;
-            padding-top: 7px;
-            border-top: 1px dashed rgba(0,0,0,0.15);
-            font-size: 0.75rem;
-            color: rgba(60,40,20,0.6);
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            left: 20px;         /* 左边界，防止长名字溢出 */
+            font-size: 0.72rem;
+            color: rgba(60,40,20,0.55);
             text-align: right;
             font-style: italic;
             font-family: 'Segoe UI', sans-serif;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            pointer-events: none;
+            border-top: 1px dashed rgba(0,0,0,0.12);
+            padding-top: 4px;
+            line-height: 1.3;
         }
 
         /* 缩放控制条 — 右下角固定，移动端友好 */
@@ -551,30 +554,80 @@
             // 工具函数：随机范围
             const random = (min, max) => Math.random() * (max - min) + min;
 
-            // 字数限制（含 Markdown 标记符，按可见字符计）
+            // ── 可见字符计数：剥离所有 Markdown 语法符号和 URL，只数实际内容 ──
             const MAX_CHARS = 100;
-            function truncateText(text) {
-                if (!text) return '';
-                // 剥离 Markdown 标记估算可见字符数
-                const visible = text
-                    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1') // 链接/图片
-                    .replace(/(`{1,3})[^`]*/g, '')           // 代码
-                    .replace(/#{1,6}\s*/g, '')                  // 标题
-                    .replace(/[*_~`>]+/g, '');                  // 强调/引用
-                if (visible.length <= MAX_CHARS) return text;
-                // 按原始文本截断，留余量给 Markdown 符号
-                return text.slice(0, Math.round(MAX_CHARS * 1.4)) + '…';
+            function countVisible(text) {
+                if (!text) return 0;
+                return text
+                    .replace(/!?\[([^\]]*?)\]\([^)]*?\)/g, '$1') // 链接/图片：只保留显示文字
+                    .replace(/```[\s\S]*?```/g, m => m.slice(3, -3).trim()) // 代码块
+                    .replace(/`([^`]*?)`/g, '$1')   // 行内代码
+                    .replace(/^#{1,6}\s+/gm, '')     // 标题符号
+                    .replace(/[*_~]{1,3}/g, '')      // 粗体/斜体/删除线符号
+                    .replace(/^>\s*/gm, '')           // 引用符号
+                    .replace(/^[-*+]\s+/gm, '')       // 无序列表符号
+                    .replace(/^\d+\.\s+/gm, '')       // 有序列表符号
+                    .replace(/^[-*_]{3,}\s*$/gm, '')  // 水平线
+                    .replace(/\n/g, '')               // 换行不计字数
+                    .length;
             }
 
-            // Markdown 渲染 (使用 marked)
-            function renderMarkdown(text) {
-                if (typeof marked === 'undefined') return text;
-                try {
-                    return marked.parse(text);
-                } catch (e) {
-                    return text;
+            function truncateText(text) {
+                if (!text) return '';
+                if (countVisible(text) <= MAX_CHARS) return text;
+                // 逐步扫描原文，跳过不计字数的部分，达到上限时截断
+                let visible = 0;
+                let i = 0;
+                while (i < text.length && visible < MAX_CHARS) {
+                    const rest = text.slice(i);
+                    let m;
+                    // 链接/图片 [显示文字](url) → 只计显示文字
+                    if ((m = rest.match(/^!?\[([^\]]*?)\]\([^)]*?\)/))) {
+                        visible += m[1].length; i += m[0].length; continue;
+                    }
+                    // 代码块 ```...```
+                    if ((m = rest.match(/^```[\s\S]*?```/))) {
+                        visible += m[0].slice(3,-3).trim().replace(/\n/g,'').length;
+                        i += m[0].length; continue;
+                    }
+                    // 行内代码 `...`
+                    if ((m = rest.match(/^`([^`]*?)`/))) {
+                        visible += m[1].length; i += m[0].length; continue;
+                    }
+                    // 标题符号 # ## ...（行首）
+                    if ((m = rest.match(/^#{1,6}\s+/))) { i += m[0].length; continue; }
+                    // 粗体/斜体/删除线符号
+                    if ((m = rest.match(/^[*_~]{1,3}/))) { i += m[0].length; continue; }
+                    // 引用符号 > （行首）
+                    if ((m = rest.match(/^>\s*/))) { i += m[0].length; continue; }
+                    // 列表符号（行首）
+                    if ((m = rest.match(/^[-*+]\s+|^\d+\.\s+/))) { i += m[0].length; continue; }
+                    // 水平线
+                    if ((m = rest.match(/^[-*_]{3,}\s*\n/))) { i += m[0].length; continue; }
+                    // 换行不计
+                    if (text[i] === '\n') { i++; continue; }
+                    visible++;
+                    i++;
                 }
+                return text.slice(0, i) + '…';
             }
+
+            // Markdown 渲染（marked 是 defer，可能稍后就绪）
+            function renderMarkdown(text) {
+                if (typeof marked === 'undefined') return text; // 降级纯文本
+                try { return marked.parse(text); } catch(e) { return text; }
+            }
+
+            // marked 就绪后重新渲染所有便签内容（仅当 defer 导致首次渲染是纯文本时触发）
+            function rewireMarkdown() {
+                if (typeof marked === 'undefined') return;
+                document.querySelectorAll('.note-content[data-raw]').forEach(el => {
+                    try { el.innerHTML = marked.parse(el.dataset.raw); } catch(e) {}
+                    delete el.dataset.raw;
+                });
+            }
+            document.querySelector('script[src*="marked"]')
+                ?.addEventListener('load', rewireMarkdown);
 
             // 创建便签（支持 style：颜色名 / #hex / 图片链接，以及可选 author 署名）
             function createNote(mdText, left, top, rotate = null, style = 'yellow', author = '') {
@@ -590,7 +643,7 @@
                             note.style.setProperty('background-image', `url("${style}")`, 'important');
                         };
                         img.onerror = () => note.classList.add('img-error');
-                        img.crossOrigin = 'anonymous';
+                        // 先不设 crossOrigin，大多数图床不需要，避免 CORS preflight 拖慢
                         img.src = style;
                     } else if (style.startsWith('#')) {
                         note.classList.add('custom-color');
@@ -614,7 +667,13 @@
                 // ── 正文内容 ──
                 const contentSpan = document.createElement('span');
                 contentSpan.className = 'note-content';
-                contentSpan.innerHTML = renderMarkdown(truncateText(mdText));
+                const truncated = truncateText(mdText);
+                const html = renderMarkdown(truncated);
+                contentSpan.innerHTML = html;
+                // 若 marked 尚未就绪（defer），保存原文供 rewireMarkdown 补渲染
+                if (html === truncated && truncated.trim()) {
+                    contentSpan.dataset.raw = truncated;
+                }
                 note.appendChild(contentSpan);
 
                 // ── 署名（有 author 时显示）──
@@ -648,186 +707,117 @@
                 return "#" + (0x1000000 + (R>255?255:R<0?0:R)*0x10000 + (G>255?255:G<0?0:G)*0x100 + (B>255?255:B<0?0:B)).toString(16).slice(1);
             }
 
-            // 拖拽逻辑 (添加粘滞效果)
-            function makeDraggable(element) {
-                let isDragging = false;
-                let startX, startY;
-                let initialLeft, initialTop;
-                let hasMoved = false;
-                let lastX, lastY; // 记录上一次鼠标位置
-                let velocity = { x: 0, y: 0 }; // 记录拖动速度
-                let lastTime = 0; // 记录上一次时间
+            // ── 便签拖拽：事件委托到 wall，避免 N 张便签 × 2 个监听器 ──
+            // 拖拽状态（全局单例，同时只能拖一张）
+            let dragNote = null, dragStartX = 0, dragStartY = 0;
+            let dragInitLeft = 0, dragInitTop = 0;
+            let dragHasMoved = false;
+            let dragVX = 0, dragVY = 0, dragLastX = 0, dragLastY = 0, dragLastT = 0;
+            let dragRafId = null;
+            // 预存便签尺寸，避免拖动中反复触发 layout
+            const NOTE_W = 240, NOTE_H = 200;
 
-                function getPosition() {
-                    const left = parseFloat(element.style.left) || 0;
-                    const top = parseFloat(element.style.top) || 0;
-                    return { left, top };
-                }
-
-                function onDragStart(e) {
-                    // 检查是否点击了超链接，如果是，则不启动拖拽
-                    let target = e.target;
-                    while (target) {
-                        if (target.tagName === 'A') {
-                            return; // 是超链接，不启动拖拽
-                        }
-                        target = target.parentElement;
-                        if (target === element) break;
-                    }
-
-                    if (e.button !== undefined && e.button !== 0) return;
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    let clientX, clientY;
-                    if (e.type === 'mousedown') {
-                        clientX = e.clientX;
-                        clientY = e.clientY;
-                    } else if (e.type === 'touchstart') {
-                        clientX = e.touches[0].clientX;
-                        clientY = e.touches[0].clientY;
-                    } else {
-                        return;
-                    }
-
-                    startX = clientX;
-                    startY = clientY;
-                    lastX = clientX;
-                    lastY = clientY;
-                    lastTime = Date.now();
-                    velocity = { x: 0, y: 0 };
-
-                    const pos = getPosition();
-                    initialLeft = pos.left;
-                    initialTop = pos.top;
-
-                    isDragging = true;
-                    hasMoved = false;
-
-                    maxZIndex += 1;
-                    element.style.zIndex = maxZIndex;
-                    element.style.transition = 'none'; // 拖动时禁用过渡效果
-
-                    document.addEventListener('mousemove', onDragMove);
-                    document.addEventListener('mouseup', onDragEnd);
-                    document.addEventListener('touchmove', onDragMove, { passive: false });
-                    document.addEventListener('touchend', onDragEnd);
-                    document.addEventListener('touchcancel', onDragCancel);
-                }
-
-                function onDragMove(e) {
-                    if (!isDragging) return;
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    let clientX, clientY;
-                    if (e.type === 'mousemove') {
-                        clientX = e.clientX;
-                        clientY = e.clientY;
-                    } else if (e.type === 'touchmove') {
-                        clientX = e.touches[0].clientX;
-                        clientY = e.touches[0].clientY;
-                    } else {
-                        return;
-                    }
-
-                    // 计算速度
-                    const currentTime = Date.now();
-                    const deltaTime = currentTime - lastTime;
-                    if (deltaTime > 0) {
-                        velocity.x = (clientX - lastX) / deltaTime * 16; // 标准化到60fps
-                        velocity.y = (clientY - lastY) / deltaTime * 16;
-                    }
-
-                    lastX = clientX;
-                    lastY = clientY;
-                    lastTime = currentTime;
-
-                    const dx = clientX - startX;
-                    const dy = clientY - startY;
-
-                    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) hasMoved = true;
-
-                    let newLeft = initialLeft + dx;
-                    let newTop = initialTop + dy;
-
-                    // 软限制 (便签不能完全离开墙)
-                    const minX = -element.offsetWidth + 30;
-                    const maxX = WALL_WIDTH - 30;
-                    const minY = -element.offsetHeight + 30;
-                    const maxY = WALL_HEIGHT - 30;
-                    newLeft = Math.min(maxX, Math.max(minX, newLeft));
-                    newTop = Math.min(maxY, Math.max(minY, newTop));
-
-                    element.style.left = newLeft + 'px';
-                    element.style.top = newTop + 'px';
-                }
-
-                function onDragEnd(e) {
-                    if (!isDragging) return;
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    document.removeEventListener('mousemove', onDragMove);
-                    document.removeEventListener('mouseup', onDragEnd);
-                    document.removeEventListener('touchmove', onDragMove);
-                    document.removeEventListener('touchend', onDragEnd);
-                    document.removeEventListener('touchcancel', onDragCancel);
-                    isDragging = false;
-
-                    // 应用粘滞效果
-                    if (hasMoved) {
-                        applyStickyEffect();
-                    }
-                }
-
-                function applyStickyEffect() {
-                    // 启用过渡效果
-                    element.style.transition = 'left 0.3s ease-out, top 0.3s ease-out';
-
-                    // 获取当前位置
-                    const pos = getPosition();
-                    let newLeft = pos.left + velocity.x * 0.5; // 应用速度衰减
-                    let newTop = pos.top + velocity.y * 0.5;
-
-                    // 软限制 (便签不能完全离开墙)
-                    const minX = -element.offsetWidth + 30;
-                    const maxX = WALL_WIDTH - 30;
-                    const minY = -element.offsetHeight + 30;
-                    const maxY = WALL_HEIGHT - 30;
-                    newLeft = Math.min(maxX, Math.max(minX, newLeft));
-                    newTop = Math.min(maxY, Math.max(minY, newTop));
-
-                    // 应用新位置
-                    element.style.left = newLeft + 'px';
-                    element.style.top = newTop + 'px';
-
-                    // 过渡结束后禁用过渡效果
-                    setTimeout(() => {
-                        element.style.transition = 'none';
-                    }, 300);
-                }
-
-                function onDragCancel(e) {
-                    onDragEnd(e);
-                }
-
-                element.addEventListener('mousedown', onDragStart);
-                element.addEventListener('touchstart', onDragStart, { passive: false });
+            function noteDragStart(note, clientX, clientY) {
+                dragNote = note;
+                dragStartX = clientX; dragStartY = clientY;
+                dragInitLeft  = parseFloat(note.style.left)  || 0;
+                dragInitTop   = parseFloat(note.style.top)   || 0;
+                dragLastX = clientX; dragLastY = clientY;
+                dragLastT = Date.now();
+                dragVX = 0; dragVY = 0;
+                dragHasMoved = false;
+                maxZIndex++;
+                note.style.zIndex = maxZIndex;
+                note.style.transition = 'none';
             }
 
-            // 初始化便签
+            function noteDragMove(clientX, clientY) {
+                if (!dragNote) return;
+                const now = Date.now(), dt = now - dragLastT;
+                if (dt > 0) {
+                    dragVX = (clientX - dragLastX) / dt * 16;
+                    dragVY = (clientY - dragLastY) / dt * 16;
+                }
+                dragLastX = clientX; dragLastY = clientY; dragLastT = now;
+
+                const dx = clientX - dragStartX, dy = clientY - dragStartY;
+                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragHasMoved = true;
+
+                let newLeft = Math.min(WALL_WIDTH - 30,  Math.max(-NOTE_W + 30, dragInitLeft + dx));
+                let newTop  = Math.min(WALL_HEIGHT - 30, Math.max(-NOTE_H + 30, dragInitTop  + dy));
+
+                // rAF 节流写 DOM
+                if (dragRafId) cancelAnimationFrame(dragRafId);
+                dragRafId = requestAnimationFrame(() => {
+                    if (dragNote) {
+                        dragNote.style.left = newLeft + 'px';
+                        dragNote.style.top  = newTop  + 'px';
+                    }
+                });
+            }
+
+            function noteDragEnd() {
+                if (!dragNote) return;
+                cancelAnimationFrame(dragRafId);
+                if (dragHasMoved) {
+                    const note = dragNote;
+                    const vx = dragVX, vy = dragVY;
+                    let newLeft = Math.min(WALL_WIDTH-30, Math.max(-NOTE_W+30,
+                        parseFloat(note.style.left) + vx * 0.5));
+                    let newTop  = Math.min(WALL_HEIGHT-30, Math.max(-NOTE_H+30,
+                        parseFloat(note.style.top)  + vy * 0.5));
+                    note.style.transition = 'left 0.25s ease-out, top 0.25s ease-out';
+                    note.style.left = newLeft + 'px';
+                    note.style.top  = newTop  + 'px';
+                    setTimeout(() => { if (note) note.style.transition = 'none'; }, 260);
+                }
+                dragNote = null;
+                dragRafId = null;
+            }
+
+            // wall 层统一委托 mousedown / touchstart
+            function initNoteDrag() {
+                wall.addEventListener('mousedown', (e) => {
+                    const note = e.target.closest('.note');
+                    if (!note || e.button !== 0) return;
+                    if (e.target.closest('a')) return; // 超链接不拖
+                    e.preventDefault(); e.stopPropagation();
+                    noteDragStart(note, e.clientX, e.clientY);
+                    document.addEventListener('mousemove', onDocMouseMove);
+                    document.addEventListener('mouseup',  onDocMouseUp,  { once: true });
+                });
+                wall.addEventListener('touchstart', (e) => {
+                    if (e.touches.length !== 1) return;
+                    const note = e.target.closest('.note');
+                    if (!note) return;
+                    if (e.target.closest('a')) return;
+                    e.preventDefault(); e.stopPropagation();
+                    noteDragStart(note, e.touches[0].clientX, e.touches[0].clientY);
+                    document.addEventListener('touchmove', onDocTouchMove, { passive: false });
+                    document.addEventListener('touchend',  onDocTouchEnd,  { once: true });
+                    document.addEventListener('touchcancel', onDocTouchEnd, { once: true });
+                }, { passive: false });
+            }
+            function onDocMouseMove(e) { noteDragMove(e.clientX, e.clientY); }
+            function onDocMouseUp()    { noteDragEnd(); document.removeEventListener('mousemove', onDocMouseMove); }
+            function onDocTouchMove(e) { e.preventDefault(); if (e.touches.length===1) noteDragMove(e.touches[0].clientX, e.touches[0].clientY); }
+            function onDocTouchEnd()   { noteDragEnd(); document.removeEventListener('touchmove', onDocTouchMove); }
+            // makeDraggable 保留为空操作（createNote 仍会调用）
+            function makeDraggable(_el) { /* 已改为 wall 层事件委托，无需逐元素绑定 */ }
+
+            // 初始化便签（DocumentFragment 批量插入，只触发一次 reflow）
             function initDefaultNotes(data = null) {
                 if (!data || !data.notes) return;
+                const frag = document.createDocumentFragment();
                 data.notes.forEach((item) => {
-                    const note = createNote(
+                    frag.appendChild(createNote(
                         item.text,
                         null, null, null,
                         item.style  || 'yellow',
                         item.author || ''
-                    );
-                    wall.appendChild(note);
+                    ));
                 });
+                wall.appendChild(frag);
             }
 
             // 设备检测
@@ -840,11 +830,17 @@
             // 存储光标位置
             let cursorPos = { x: 0, y: 0 };
             
-            // 更新光标位置
+            // 更新光标位置（throttle：每帧最多更新一次）
+            let cursorRafPending = false;
             wrapper.addEventListener('mousemove', (e) => {
-                cursorPos.x = e.clientX;
-                cursorPos.y = e.clientY;
-            });
+                if (cursorRafPending) return;
+                cursorRafPending = true;
+                requestAnimationFrame(() => {
+                    cursorPos.x = e.clientX;
+                    cursorPos.y = e.clientY;
+                    cursorRafPending = false;
+                });
+            }, { passive: true });
 
             // ========== 缩放逻辑 (支持跟随光标，不出界) ==========
             // 注意：wrapper.scrollLeft/scrollTop 工作在"缩放后像素"坐标系中。
@@ -917,11 +913,28 @@
                 updateZoom(newScale, !mobileDevice); // 根据设备类型决定是否使用光标跟随缩放
             });
 
-            // 初始缩放与滚动 (使墙中间区域可见)
-            window.addEventListener('load', async () => {
-                makeWallDraggable(); // 启用墙面拖动功能
+            // 滚动到墙面中心
+            function scrollToCenter() {
+                const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
+                const scaledW = WALL_WIDTH * currentScale, scaledH = WALL_HEIGHT * currentScale;
+                slider.value = currentScale;
+                zoomSpan.innerText = Math.round(currentScale * 100) + '%';
+                wall.style.transform = `scale(${currentScale})`;
+                wrapper.scrollLeft = Math.max(0, Math.min(scaledW - vw, scaledW / 2 - vw / 2));
+                wrapper.scrollTop  = Math.max(0, Math.min(scaledH - vh, scaledH / 2 - vh / 2));
+            }
 
-                // 加载外部便签数据，添加时间戳参数确保获取最新版本
+            // 初始化：加载便签 → 渲染 → 滚动定位
+            window.addEventListener('DOMContentLoaded', () => {
+                // 手势和委托立即绑定，不等 fetch
+                makeWallDraggable();
+                initNoteDrag();
+                // 先定位，避免加载数据时页面空白
+                scrollToCenter();
+            });
+
+            window.addEventListener('load', async () => {
+                // marked 库可能因 defer 稍晚就绪，此处无需等待（renderMarkdown 有判断）
                 try {
                     const response = await fetch(`notes-data.json?t=${Date.now()}`);
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -930,28 +943,6 @@
                 } catch (error) {
                     console.warn('无法加载便签数据:', error.message);
                 }
-                
-                // 设置初始缩放为1，并滚动到墙面中心
-                setTimeout(() => {
-                    const vw = wrapper.clientWidth;
-                    const vh = wrapper.clientHeight;
-
-                    // 确保滑块与缩放同步
-                    slider.value = currentScale;
-                    zoomSpan.innerText = Math.round(currentScale * 100) + '%';
-
-                    // 缩放后墙的屏幕像素尺寸（scale=1 时等于墙尺寸）
-                    const scaledW = WALL_WIDTH * currentScale;
-                    const scaledH = WALL_HEIGHT * currentScale;
-
-                    // 让墙面中心对准视口中心（缩放后像素坐标系）
-                    const targetScrollLeft = (scaledW / 2) - (vw / 2);
-                    const targetScrollTop  = (scaledH / 2) - (vh / 2);
-
-                    wall.style.transform = `scale(${currentScale})`;
-                    wrapper.scrollLeft = Math.max(0, Math.min(scaledW - vw, targetScrollLeft));
-                    wrapper.scrollTop  = Math.max(0, Math.min(scaledH - vh, targetScrollTop));
-                }, 100);
             });
 
             // ── 墙面手势管理器：统一处理单指拖动 + 双指缩放 ──
@@ -1131,27 +1122,21 @@
                 }
             });
 
-            // 鼠标滚轮缩放功能
+            // 鼠标滚轮缩放（passive:false 允许 preventDefault，rAF 节流避免连续帧堆积）
+            let wheelRafId = null;
             wrapper.addEventListener('wheel', (e) => {
                 e.preventDefault();
-                
-                // 更新光标位置
                 cursorPos.x = e.clientX;
                 cursorPos.y = e.clientY;
-                
-                // 计算缩放增量，根据滚轮方向
                 const delta = e.deltaY > 0 ? -0.05 : 0.05;
-                let newScale = currentScale + delta;
-                
-                // 限制缩放范围
-                newScale = Math.max(0.2, Math.min(3, newScale));
-                
-                // 更新滑块值
+                let newScale = Math.max(0.2, Math.min(3, currentScale + delta));
                 slider.value = newScale;
-                
-                // 根据设备类型决定是否使用光标跟随缩放
-                updateZoom(newScale, !mobileDevice);
-            });
+                if (wheelRafId) return; // 上一帧还没处理完，跳过
+                wheelRafId = requestAnimationFrame(() => {
+                    updateZoom(newScale, !mobileDevice);
+                    wheelRafId = null;
+                });
+            }, { passive: false });
 
             // 双指缩放已整合至 makeWallDraggable() 的统一手势管理器
 
