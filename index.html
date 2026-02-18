@@ -2,16 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>便签投稿墙</title>
+    <!-- 性能优化 -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="https://www.transparenttextures.com">
     <!-- 使用 marked 解析 Markdown (轻量, 安全) -->
     <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js" defer></script>
     <style>
         * {
             box-sizing: border-box;
-            user-select: none; /* 防止拖拽时选中 */
+            user-select: none;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
         }
         body {
             background: #2d241e;
@@ -22,16 +27,14 @@
             touch-action: pan-x pan-y pinch-zoom; /* 允许单指平移 + 双指缩放 */
         }
 
-        /* 全屏滚动容器 */
+        /* 全屏容器 */
         .wall-wrapper {
             width: 100vw;
             height: 100vh;
-            overflow: auto;
+            overflow: hidden;  /* 完全禁用滚动，用 transform 控制 */
             position: relative;
-            touch-action: none; /* JS 完整接管所有触摸手势（单指拖动 + 双指缩放） */
-            /* 蓝天背景，缩小时显示美观的外界 */
+            touch-action: none;
             background: linear-gradient(to bottom, #87ceeb, #b0e0e6);
-            -webkit-overflow-scrolling: touch; /* 流畅滚动 */
             cursor: grab;
         }
         .wall-wrapper:active {
@@ -40,18 +43,21 @@
 
         /* 巨墙 — 背景图片链接在此修改 */
         .wall {
-            position: relative;
+            position: absolute;
+            left: 50%; top: 50%;
             width: 10000px;
             height: 10000px;
-            /* ===== 背景图片链接 ===== */
-            background-image: url('https://www.transparenttextures.com/patterns/old-wall.png');  /* 默认砖纹图片 */
+            background-image: url('https://www.transparenttextures.com/patterns/old-wall.png');
             background-color: #b08a67;
             background-repeat: repeat;
             background-size: 300px 300px;
             box-shadow: inset 0 0 0 4px #5a3f2e;
-            transform-origin: 0 0;  /* 使用左上角作为变换原点，便于缩放 */
+            transform-origin: center center;  /* 中心缩放，配合 translate(-50%, -50%) */
+            transform: translate(-50%, -50%) scale(1);
             will-change: transform;
             cursor: grab;
+            backface-visibility: hidden;  /* 强制 GPU 层 */
+            -webkit-backface-visibility: hidden;
         }
         .wall:active {
             cursor: grabbing;
@@ -75,7 +81,7 @@
             color: #2d241b;
             border-radius: 5px 20px 12px 8px;
             transform-origin: 0 0;
-            transition: box-shadow 0.1s, filter 0.1s;
+            transition: transform 0.25s ease-out, box-shadow 0.1s, filter 0.1s;
             cursor: grab;
             word-wrap: break-word;
             z-index: 1;
@@ -500,7 +506,24 @@
                 font-size: 1.1rem;
             }
         }
-    </style>
+    
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            .note {
+                font-size: 1rem;        /* 字号稍大，触摸友好 */
+                min-height: 180px;
+            }
+            .zoom-control {
+                bottom: 16px;
+                right: 16px;
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            .zoom-control input {
+                width: 140px;
+            }
+        }
+</style>
 </head>
 <body>
     <!-- 滚动容器 -->
@@ -612,22 +635,55 @@
                 return text.slice(0, i) + '…';
             }
 
-            // Markdown 渲染（marked 是 defer，可能稍后就绪）
+            // Markdown 渲染（带缓存）
             function renderMarkdown(text) {
-                if (typeof marked === 'undefined') return text; // 降级纯文本
-                try { return marked.parse(text); } catch(e) { return text; }
+                if (typeof marked === 'undefined') return text;
+                if (!mdCache.has(text)) {
+                    try { mdCache.set(text, marked.parse(text)); } catch(e) { mdCache.set(text, text); }
+                }
+                return mdCache.get(text);
             }
 
-            // marked 就绪后重新渲染所有便签内容（仅当 defer 导致首次渲染是纯文本时触发）
+            // marked 就绪后重新渲染（带缓存，避免重复解析）
+            const mdCache = new Map();
             function rewireMarkdown() {
                 if (typeof marked === 'undefined') return;
                 document.querySelectorAll('.note-content[data-raw]').forEach(el => {
-                    try { el.innerHTML = marked.parse(el.dataset.raw); } catch(e) {}
+                    const raw = el.dataset.raw;
+                    if (!mdCache.has(raw)) {
+                        try { mdCache.set(raw, marked.parse(raw)); } catch(e) { mdCache.set(raw, raw); }
+                    }
+                    el.innerHTML = mdCache.get(raw);
                     delete el.dataset.raw;
                 });
             }
             document.querySelector('script[src*="marked"]')
                 ?.addEventListener('load', rewireMarkdown);
+
+
+            // ── 图片背景懒加载（Intersection Observer）──
+            let imgObserver = null;
+            function initImgObserver() {
+                if (imgObserver) return;
+                imgObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const note = entry.target;
+                            const imgUrl = note.dataset.bgImg;
+                            if (imgUrl) {
+                                const img = new Image();
+                                img.onload = () => {
+                                    note.style.setProperty('background-image', `url("${imgUrl}")`, 'important');
+                                    delete note.dataset.bgImg;
+                                };
+                                img.onerror = () => note.classList.add('img-error');
+                                img.src = imgUrl;
+                                imgObserver.unobserve(note);
+                            }
+                        }
+                    });
+                }, { rootMargin: '100px' });  // 提前 100px 开始加载
+            }
 
             // 创建便签（支持 style：颜色名 / #hex / 图片链接，以及可选 author 署名）
             function createNote(mdText, left, top, rotate = null, style = 'yellow', author = '') {
@@ -638,13 +694,9 @@
                 if (typeof style === 'string') {
                     if (style.startsWith('http') || style.startsWith('//')) {
                         note.classList.add('has-image-bg');
-                        const img = new Image();
-                        img.onload = () => {
-                            note.style.setProperty('background-image', `url("${style}")`, 'important');
-                        };
-                        img.onerror = () => note.classList.add('img-error');
-                        // 先不设 crossOrigin，大多数图床不需要，避免 CORS preflight 拖慢
-                        img.src = style;
+                        note.dataset.bgImg = style;  // 存到 data 属性，延迟加载
+                        initImgObserver();
+                        imgObserver.observe(note);  // 进入视口后才加载
                     } else if (style.startsWith('#')) {
                         note.classList.add('custom-color');
                         note.style.background = `linear-gradient(145deg, ${lightenColor(style, 5)}, ${darkenColor(style, 5)})`;
@@ -746,12 +798,12 @@
                 let newLeft = Math.min(WALL_WIDTH - 30,  Math.max(-NOTE_W + 30, dragInitLeft + dx));
                 let newTop  = Math.min(WALL_HEIGHT - 30, Math.max(-NOTE_H + 30, dragInitTop  + dy));
 
-                // rAF 节流写 DOM
+                // rAF 节流写 DOM：拖拽中禁用 transition，用 translate 即时移动
                 if (dragRafId) cancelAnimationFrame(dragRafId);
                 dragRafId = requestAnimationFrame(() => {
                     if (dragNote) {
-                        dragNote.style.left = newLeft + 'px';
-                        dragNote.style.top  = newTop  + 'px';
+                        dragNote.style.transition = 'none';
+                        dragNote.style.transform = `translate(${newLeft}px, ${newTop}px)`;
                     }
                 });
             }
@@ -759,20 +811,25 @@
             function noteDragEnd() {
                 if (!dragNote) return;
                 cancelAnimationFrame(dragRafId);
-                if (dragHasMoved) {
-                    const note = dragNote;
-                    const vx = dragVX, vy = dragVY;
-                    let newLeft = Math.min(WALL_WIDTH-30, Math.max(-NOTE_W+30,
-                        parseFloat(note.style.left) + vx * 0.5));
-                    let newTop  = Math.min(WALL_HEIGHT-30, Math.max(-NOTE_H+30,
-                        parseFloat(note.style.top)  + vy * 0.5));
-                    note.style.transition = 'left 0.25s ease-out, top 0.25s ease-out';
-                    note.style.left = newLeft + 'px';
-                    note.style.top  = newTop  + 'px';
-                    setTimeout(() => { if (note) note.style.transition = 'none'; }, 260);
-                }
+                const note = dragNote;
                 dragNote = null;
                 dragRafId = null;
+                if (!dragHasMoved) return;
+
+                // 读取当前 translate 位置
+                const m = note.style.transform.match(/translate\(([^,]+)px, ([^)]+)px\)/);
+                let curX = m ? parseFloat(m[1]) : 0;
+                let curY = m ? parseFloat(m[2]) : 0;
+
+                // 应用速度衰减
+                let finalX = Math.min(WALL_WIDTH-30, Math.max(-NOTE_W+30, curX + dragVX * 0.5));
+                let finalY = Math.min(WALL_HEIGHT-30, Math.max(-NOTE_H+30, curY + dragVY * 0.5));
+
+                // 写回 left/top，清除 translate，让 transition 接管
+                note.style.left = finalX + 'px';
+                note.style.top  = finalY + 'px';
+                note.style.transform = '';
+                note.style.transition = ''; // 恢复 CSS 默认 transition
             }
 
             // wall 层统一委托 mousedown / touchstart
@@ -842,69 +899,44 @@
                 });
             }, { passive: true });
 
-            // ========== 缩放逻辑 (支持跟随光标，不出界) ==========
-            // 注意：wrapper.scrollLeft/scrollTop 工作在"缩放后像素"坐标系中。
-            // 墙经过 scale(s) 后，其实际占用宽度 = WALL_WIDTH * s，
-            // 所以 maxScrollLeft = WALL_WIDTH * s - vw，单位都是屏幕像素。
-            function updateZoom(newScale, useCursor = false) {
-                const vw = wrapper.clientWidth;
-                const vh = wrapper.clientHeight;
-                if (vw === 0 || vh === 0) return;
+            // ========== 缩放逻辑 (纯 transform，GPU 加速) ==========
+            let wallTranslateX = 0, wallTranslateY = 0;  // 墙的平移量（px）
 
+            function updateZoom(newScale, useCursor = false) {
+                const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
+                if (vw === 0 || vh === 0) return;
                 const oldScale = currentScale;
 
-                // 缩放后墙的实际屏幕像素尺寸
-                const scaledW = WALL_WIDTH * newScale;
-                const scaledH = WALL_HEIGHT * newScale;
-
-                // 确定"锚点"：缩放前后该点在屏幕上保持不动
-                // focusX/Y 是视口内的屏幕坐标（像素）
-                let focusX, focusY;
+                // 确定缩放锚点
+                let focusX = vw / 2, focusY = vh / 2;
                 if (useCursor && !mobileDevice) {
                     focusX = cursorPos.x;
                     focusY = cursorPos.y;
-                } else {
-                    // 以视口中心为锚点
-                    focusX = vw / 2;
-                    focusY = vh / 2;
                 }
 
-                // 锚点在缩放前墙面上的绝对位置（墙坐标系，单位：墙像素）
-                // 当前 scrollLeft/Top 是屏幕像素，除以 oldScale 得到墙坐标
-                const anchorWallX = (wrapper.scrollLeft + focusX) / oldScale;
-                const anchorWallY = (wrapper.scrollTop + focusY) / oldScale;
+                // 缩放时保持锚点不动：
+                // 锚点在墙坐标系的位置 = (focusX - vw/2 - wallTranslateX) / oldScale
+                // 新平移量 = wallTranslateX - (锚点墙坐标) * (newScale - oldScale)
+                const anchorWallX = (focusX - vw/2 - wallTranslateX) / oldScale;
+                const anchorWallY = (focusY - vh/2 - wallTranslateY) / oldScale;
+                wallTranslateX -= anchorWallX * (newScale - oldScale);
+                wallTranslateY -= anchorWallY * (newScale - oldScale);
 
-                // 缩放后，为了让锚点仍位于屏幕上同一位置，新的 scrollLeft/Top：
-                let newScrollLeft = anchorWallX * newScale - focusX;
-                let newScrollTop  = anchorWallY * newScale - focusY;
+                // 限制平移范围，确保墙不会完全移出视口
+                const scaledW = WALL_WIDTH * newScale, scaledH = WALL_HEIGHT * newScale;
+                const maxOffsetX = Math.max(0, (scaledW - vw) / 2);
+                const maxOffsetY = Math.max(0, (scaledH - vh) / 2);
+                wallTranslateX = Math.max(-maxOffsetX, Math.min(maxOffsetX, wallTranslateX));
+                wallTranslateY = Math.max(-maxOffsetY, Math.min(maxOffsetY, wallTranslateY));
 
-                // 限制滚动范围，确保不会超出墙面边界
-                // 最大滚动 = 缩放后墙尺寸 - 视口尺寸；若墙比视口小则居中
-                const maxScrollLeft = Math.max(0, scaledW - vw);
-                const maxScrollTop  = Math.max(0, scaledH - vh);
-
-                if (scaledW <= vw) {
-                    // 墙比视口窄时水平居中
-                    newScrollLeft = -(vw - scaledW) / 2;
-                } else {
-                    newScrollLeft = Math.max(0, Math.min(maxScrollLeft, newScrollLeft));
-                }
-
-                if (scaledH <= vh) {
-                    // 墙比视口矮时垂直居中
-                    newScrollTop = -(vh - scaledH) / 2;
-                } else {
-                    newScrollTop = Math.max(0, Math.min(maxScrollTop, newScrollTop));
-                }
-
-                // 应用缩放，然后设置滚动（顺序很重要）
-                wall.style.transform = `scale(${newScale})`;
-                wrapper.scrollLeft = newScrollLeft;
-                wrapper.scrollTop  = newScrollTop;
-
-                // 更新当前缩放值
+                applyWallTransform(newScale);
                 currentScale = newScale;
                 zoomSpan.innerText = Math.round(newScale * 100) + '%';
+            }
+
+            function applyWallTransform(scale) {
+                // translate(-50%, -50%) 居中 + translate(offset) 平移 + scale(s) 缩放
+                wall.style.transform = `translate(calc(-50% + ${wallTranslateX}px), calc(-50% + ${wallTranslateY}px)) scale(${scale})`;
             }
 
             // 滑块事件
@@ -913,15 +945,13 @@
                 updateZoom(newScale, !mobileDevice); // 根据设备类型决定是否使用光标跟随缩放
             });
 
-            // 滚动到墙面中心
+            // 重置到墙面中心
             function scrollToCenter() {
-                const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
-                const scaledW = WALL_WIDTH * currentScale, scaledH = WALL_HEIGHT * currentScale;
+                wallTranslateX = 0;
+                wallTranslateY = 0;
                 slider.value = currentScale;
                 zoomSpan.innerText = Math.round(currentScale * 100) + '%';
-                wall.style.transform = `scale(${currentScale})`;
-                wrapper.scrollLeft = Math.max(0, Math.min(scaledW - vw, scaledW / 2 - vw / 2));
-                wrapper.scrollTop  = Math.max(0, Math.min(scaledH - vh, scaledH / 2 - vh / 2));
+                applyWallTransform(currentScale);
             }
 
             // 初始化：加载便签 → 渲染 → 滚动定位
@@ -934,7 +964,8 @@
             });
 
             window.addEventListener('load', async () => {
-                // marked 库可能因 defer 稍晚就绪，此处无需等待（renderMarkdown 有判断）
+                const loading = document.getElementById('loadingHint');
+                if (loading) loading.style.display = 'block';
                 try {
                     const response = await fetch(`notes-data.json?t=${Date.now()}`);
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -942,6 +973,10 @@
                     initDefaultNotes(data);
                 } catch (error) {
                     console.warn('无法加载便签数据:', error.message);
+                } finally {
+                    if (loading) {
+                        setTimeout(() => loading.style.display = 'none', 300);
+                    }
                 }
             });
 
@@ -950,7 +985,7 @@
 
                 // ── 鼠标拖动（桌面端）──
                 let mouseDown = false;
-                let mouseStartX, mouseStartY, mouseInitSL, mouseInitST;
+                let mouseStartX, mouseStartY, mouseInitTX, mouseInitTY;
 
                 function onMouseDown(e) {
                     if (e.target === wall || e.target === wrapper) {
@@ -959,16 +994,26 @@
                         mouseDown = true;
                         mouseStartX = e.clientX;
                         mouseStartY = e.clientY;
-                        mouseInitSL = wrapper.scrollLeft;
-                        mouseInitST = wrapper.scrollTop;
+                        mouseInitTX = wallTranslateX;
+                        mouseInitTY = wallTranslateY;
                         document.addEventListener('mousemove', onMouseMove);
                         document.addEventListener('mouseup', onMouseUp);
                     }
                 }
                 function onMouseMove(e) {
                     if (!mouseDown) return;
-                    wrapper.scrollLeft = mouseInitSL - (e.clientX - mouseStartX);
-                    wrapper.scrollTop  = mouseInitST  - (e.clientY - mouseStartY);
+                    const dx = e.clientX - mouseStartX;
+                    const dy = e.clientY - mouseStartY;
+                    wallTranslateX = mouseInitTX + dx;
+                    wallTranslateY = mouseInitTY + dy;
+                    // 限制范围
+                    const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
+                    const scaledW = WALL_WIDTH * currentScale, scaledH = WALL_HEIGHT * currentScale;
+                    const maxX = Math.max(0, (scaledW - vw) / 2);
+                    const maxY = Math.max(0, (scaledH - vh) / 2);
+                    wallTranslateX = Math.max(-maxX, Math.min(maxX, wallTranslateX));
+                    wallTranslateY = Math.max(-maxY, Math.min(maxY, wallTranslateY));
+                    applyWallTransform(currentScale);
                 }
                 function onMouseUp() {
                     mouseDown = false;
@@ -979,11 +1024,10 @@
                 wrapper.addEventListener('mousedown', onMouseDown);
 
                 // ── 触摸手势（移动端）：单指拖动 + 双指 pinch 缩放 ──
-                // 状态机：idle → drag(1finger) / pinch(2finger)
-                let touchState = 'idle'; // 'idle' | 'drag' | 'pinch'
-                let dragStartX, dragStartY, dragInitSL, dragInitST;
+                let touchState = 'idle';
+                let dragStartX, dragStartY, dragInitTX, dragInitTY;
                 let pinchInitDist, pinchInitScale, pinchInitMidX, pinchInitMidY;
-                let pinchInitSL, pinchInitST;
+                let pinchInitTX, pinchInitTY;
 
                 function getTouchMidpoint(touches) {
                     return {
@@ -1002,17 +1046,15 @@
                     if (e.target.closest && e.target.closest('.zoom-control')) return;
 
                     if (e.touches.length === 1) {
-                        // 只响应墙面/容器区域的单指
                         if (e.target === wall || e.target === wrapper) {
                             e.preventDefault();
                             touchState = 'drag';
                             dragStartX = e.touches[0].clientX;
                             dragStartY = e.touches[0].clientY;
-                            dragInitSL = wrapper.scrollLeft;
-                            dragInitST = wrapper.scrollTop;
+                            dragInitTX = wallTranslateX;
+                            dragInitTY = wallTranslateY;
                         }
                     } else if (e.touches.length === 2) {
-                        // 双指：无论从哪里落下都进入 pinch 模式，覆盖之前的拖动
                         e.preventDefault();
                         touchState = 'pinch';
                         pinchInitDist  = getTouchDist(e.touches);
@@ -1020,8 +1062,8 @@
                         const mid = getTouchMidpoint(e.touches);
                         pinchInitMidX = mid.x;
                         pinchInitMidY = mid.y;
-                        pinchInitSL = wrapper.scrollLeft;
-                        pinchInitST = wrapper.scrollTop;
+                        pinchInitTX = wallTranslateX;
+                        pinchInitTY = wallTranslateY;
                     }
                 }
 
@@ -1032,8 +1074,15 @@
                     if (touchState === 'drag' && e.touches.length === 1) {
                         const dx = e.touches[0].clientX - dragStartX;
                         const dy = e.touches[0].clientY - dragStartY;
-                        wrapper.scrollLeft = dragInitSL - dx;
-                        wrapper.scrollTop  = dragInitST  - dy;
+                        wallTranslateX = dragInitTX + dx;
+                        wallTranslateY = dragInitTY + dy;
+                        const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
+                        const scaledW = WALL_WIDTH * currentScale, scaledH = WALL_HEIGHT * currentScale;
+                        const maxX = Math.max(0, (scaledW - vw) / 2);
+                        const maxY = Math.max(0, (scaledH - vh) / 2);
+                        wallTranslateX = Math.max(-maxX, Math.min(maxX, wallTranslateX));
+                        wallTranslateY = Math.max(-maxY, Math.min(maxY, wallTranslateY));
+                        applyWallTransform(currentScale);
 
                     } else if (e.touches.length === 2) {
                         // 如果中途变为双指，升级为 pinch
@@ -1044,8 +1093,8 @@
                             const mid = getTouchMidpoint(e.touches);
                             pinchInitMidX = mid.x;
                             pinchInitMidY = mid.y;
-                            pinchInitSL = wrapper.scrollLeft;
-                            pinchInitST = wrapper.scrollTop;
+                            pinchInitTX = wallTranslateX;
+                            pinchInitTY = wallTranslateY;
                             return;
                         }
 
@@ -1053,28 +1102,24 @@
                         let newScale = pinchInitScale * (dist / pinchInitDist);
                         newScale = Math.max(0.2, Math.min(3, newScale));
 
-                        // 以双指中点为缩放锚点
+                        // 以双指中点为锚点缩放
                         const mid = getTouchMidpoint(e.touches);
-                        const oldScale = currentScale;
+                        const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
+                        // 锚点在墙坐标系的位置（相对初始时）
+                        const anchorWallX = (pinchInitMidX - vw/2 - pinchInitTX) / pinchInitScale;
+                        const anchorWallY = (pinchInitMidY - vh/2 - pinchInitTY) / pinchInitScale;
+                        // 新平移 = 初始平移 + 锚点偏移 + 中点移动
+                        wallTranslateX = pinchInitTX - anchorWallX * (newScale - pinchInitScale) + (mid.x - pinchInitMidX);
+                        wallTranslateY = pinchInitTY - anchorWallY * (newScale - pinchInitScale) + (mid.y - pinchInitMidY);
 
-                        // 锚点在墙坐标系的位置（用缩放前 scroll + 初始中点计算）
-                        const anchorWallX = (pinchInitSL + pinchInitMidX) / pinchInitScale;
-                        const anchorWallY = (pinchInitST  + pinchInitMidY) / pinchInitScale;
+                        // 限制范围
+                        const scaledW = WALL_WIDTH * newScale, scaledH = WALL_HEIGHT * newScale;
+                        const maxX = Math.max(0, (scaledW - vw) / 2);
+                        const maxY = Math.max(0, (scaledH - vh) / 2);
+                        wallTranslateX = Math.max(-maxX, Math.min(maxX, wallTranslateX));
+                        wallTranslateY = Math.max(-maxY, Math.min(maxY, wallTranslateY));
 
-                        // 新 scroll：让同一墙坐标点对齐到当前中点屏幕位置
-                        let newSL = anchorWallX * newScale - mid.x;
-                        let newST = anchorWallY * newScale - mid.y;
-
-                        const scaledW = WALL_WIDTH  * newScale;
-                        const scaledH = WALL_HEIGHT * newScale;
-                        const vw = wrapper.clientWidth;
-                        const vh = wrapper.clientHeight;
-                        newSL = Math.max(0, Math.min(Math.max(0, scaledW - vw), newSL));
-                        newST = Math.max(0, Math.min(Math.max(0, scaledH - vh), newST));
-
-                        wall.style.transform = `scale(${newScale})`;
-                        wrapper.scrollLeft = newSL;
-                        wrapper.scrollTop  = newST;
+                        applyWallTransform(newScale);
                         currentScale = newScale;
                         slider.value = newScale;
                         zoomSpan.innerText = Math.round(newScale * 100) + '%';
@@ -1085,12 +1130,11 @@
                     if (e.touches.length === 0) {
                         touchState = 'idle';
                     } else if (e.touches.length === 1 && touchState === 'pinch') {
-                        // 从双指变回单指：重置拖动起点，平滑切换
                         touchState = 'drag';
                         dragStartX = e.touches[0].clientX;
                         dragStartY = e.touches[0].clientY;
-                        dragInitSL = wrapper.scrollLeft;
-                        dragInitST = wrapper.scrollTop;
+                        dragInitTX = wallTranslateX;
+                        dragInitTY = wallTranslateY;
                     }
                 }
 
@@ -1143,17 +1187,27 @@
             // 窗口resize时，可能需要调整滚动边界 (保持中心点？为了简化，不做额外处理，但可保持缩放不变)
             // 可选：resize 时重新限制滚动边界，但无需更改缩放。
             window.addEventListener('resize', () => {
-                // 保证滚动位置不越界（坐标系：缩放后屏幕像素）
-                const vw = wrapper.clientWidth;
-                const vh = wrapper.clientHeight;
-                const scaledW = WALL_WIDTH * currentScale;
-                const scaledH = WALL_HEIGHT * currentScale;
-                const maxLeft = Math.max(0, scaledW - vw);
-                const maxTop  = Math.max(0, scaledH - vh);
-                wrapper.scrollLeft = Math.max(0, Math.min(maxLeft, wrapper.scrollLeft));
-                wrapper.scrollTop  = Math.max(0, Math.min(maxTop,  wrapper.scrollTop));
+                // 窗口大小变化时，限制墙的平移范围
+                const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
+                const scaledW = WALL_WIDTH * currentScale, scaledH = WALL_HEIGHT * currentScale;
+                const maxX = Math.max(0, (scaledW - vw) / 2);
+                const maxY = Math.max(0, (scaledH - vh) / 2);
+                wallTranslateX = Math.max(-maxX, Math.min(maxX, wallTranslateX));
+                wallTranslateY = Math.max(-maxY, Math.min(maxY, wallTranslateY));
+                applyWallTransform(currentScale);
             });
         })();
     </script>
+
+    <!-- 加载提示 -->
+    <div id="loadingHint" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); 
+         background:rgba(45,36,30,0.95); color:#f7d9a0; padding:20px 32px; border-radius:16px;
+         font-family:'Segoe UI',sans-serif; font-size:1rem; z-index:30000; pointer-events:none;
+         box-shadow:0 8px 32px rgba(0,0,0,0.6); display:none;">
+        <div style="text-align:center;">
+            <div style="font-size:2rem; margin-bottom:8px;">🧱</div>
+            <div>加载便签中...</div>
+        </div>
+    </div>
 </body>
 </html>
