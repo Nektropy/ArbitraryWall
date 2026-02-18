@@ -417,13 +417,11 @@
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.7);
+            background: rgba(45,36,30,0.88);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 300000;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
             padding: 15px;
         }
         .modal-box {
@@ -540,20 +538,17 @@
     </div>
 
     <!-- 弹窗 (使用说明) -->
-    <div class="modal-overlay" id="infoModal">
+    <div class="modal-overlay" id="infoModal" style="display:none;">
         <div class="modal-box">
             <h2>🧱 便签投稿墙</h2>
+            <p style="margin:12px 0;color:#9e8870;">拖动墙面探索 · 缩放查看 · 点击便签可拖动</p>
             <ul>
-                <li><strong>➕ 添加投稿</strong>：在 <code>notes-data.json</code> 的 <code>notes</code> 数组追加新对象。</li>
-                <li><strong>👤 署名字段</strong>：<code>author</code>（昵称）、<code>avatar</code>（头像链接）、<code>from</code>（来源平台）。</li>
-                <li><strong>🎨 便签颜色</strong>：<code>style</code> 填颜色名（yellow/blue…）、<code>#hex</code> 或图片链接。</li>
-                <li><strong>📝 支持 Markdown</strong>：粗体、斜体、列表、链接、代码块均可用。</li>
-                <li><strong>🔍 缩放</strong>：右下角滑块 / 鼠标滚轮 / 移动端双指。</li>
-                <li><strong>🖱️ 拖动</strong>：单指/鼠标拖动墙面，便签也可单独拖拽。</li>
+                <li><strong>缩放</strong>：滚轮 / 双指捏合 / 右下角滑块</li>
+                <li><strong>拖动</strong>：鼠标/单指拖动空白区域或便签</li>
+                <li><strong>投稿</strong>：编辑 notes-data.json 添加便签</li>
             </ul>
             <button class="modal-close" id="closeModalBtn">开始探索 🚀</button>
         </div>
-    </div>
     </div>
 
     <script>
@@ -661,6 +656,93 @@
                 ?.addEventListener('load', rewireMarkdown);
 
 
+
+            // ── 虚拟滚动管理器：大量便签时只渲染可见区域 ──
+            const BUFFER = 500;  // 视口外扩 500px 缓冲区
+            let allNotesData = [];  // 所有便签的原始数据
+            let renderedNotes = new Map();  // noteId → DOM element
+            let viewportCheckTimer = null;
+
+            function addNoteData(text, style, author) {
+                const id = `note-${allNotesData.length}`;
+                // 预分配位置（随机或网格，这里用随机）
+                const left = Math.random() * (WALL_WIDTH - 240) + 50;
+                const top  = Math.random() * (WALL_HEIGHT - 200) + 50;
+                const rotate = Math.random() * 10 - 5;
+                allNotesData.push({ id, text, style, author, left, top, rotate });
+                return id;
+            }
+
+            function isInViewport(noteData) {
+                const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
+                const scale = currentScale;
+                // wall 用 transform-origin: center，坐标系原点在墙中心
+                // 视口中心在墙坐标系的位置 = -wallTranslate / scale
+                const viewCenterX = -wallTranslateX / scale;
+                const viewCenterY = -wallTranslateY / scale;
+                // 视口在墙坐标系的左上角
+                const viewX = viewCenterX - vw / (2 * scale);
+                const viewY = viewCenterY - vh / (2 * scale);
+                const viewW = vw / scale;
+                const viewH = vh / scale;
+                // 便签包围盒（含 buffer）
+                const noteX = noteData.left - BUFFER;
+                const noteY = noteData.top  - BUFFER;
+                const noteW = 240 + BUFFER * 2;
+                const noteH = 200 + BUFFER * 2;
+                // AABB 碰撞
+                return !(noteX + noteW < viewX || noteX > viewX + viewW ||
+                         noteY + noteH < viewY || noteY > viewY + viewH);
+            }
+
+            function updateVisibleNotes() {
+                const toRender = new Set();
+                const toRemove = [];
+
+                // 检查哪些便签应该显示
+                allNotesData.forEach(data => {
+                    if (isInViewport(data)) {
+                        toRender.add(data.id);
+                        if (!renderedNotes.has(data.id)) {
+                            renderNote(data);
+                        }
+                    }
+                });
+
+                // 移除不可见的便签（释放 DOM）
+                renderedNotes.forEach((el, id) => {
+                    if (!toRender.has(id)) {
+                        toRemove.push(id);
+                    }
+                });
+
+                toRemove.forEach(id => {
+                    const el = renderedNotes.get(id);
+                    if (el) {
+                        // 清理 Intersection Observer（如果有）
+                        if (imgObserver && el.dataset.bgImg) {
+                            imgObserver.unobserve(el);
+                        }
+                        // 移除 DOM
+                        if (el.parentNode) el.parentNode.removeChild(el);
+                    }
+                    renderedNotes.delete(id);
+                });
+            }
+
+            function renderNote(data) {
+                const note = createNote(data.text, data.left, data.top, data.rotate, data.style, data.author);
+                note.dataset.noteId = data.id;
+                wall.appendChild(note);
+                renderedNotes.set(data.id, note);
+            }
+
+            // 缩放/拖动后延迟触发（300ms debounce，避免频繁切换）
+            function scheduleViewportCheck() {
+                if (viewportCheckTimer) clearTimeout(viewportCheckTimer);
+                viewportCheckTimer = setTimeout(updateVisibleNotes, 300);
+            }
+
             // ── 图片背景懒加载（Intersection Observer）──
             let imgObserver = null;
             function initImgObserver() {
@@ -682,7 +764,11 @@
                             }
                         }
                     });
-                }, { rootMargin: '100px' });  // 提前 100px 开始加载
+                }, { 
+                    root: wrapper,  // 限定在 wrapper 内检测
+                    rootMargin: '200px',  // 提前 200px
+                    threshold: 0.01  // 只要露出 1% 就触发
+                });
             }
 
             // 创建便签（支持 style：颜色名 / #hex / 图片链接，以及可选 author 署名）
@@ -772,6 +858,8 @@
             function noteDragStart(note, clientX, clientY) {
                 dragNote = note;
                 dragStartX = clientX; dragStartY = clientY;
+                // 清除之前可能残留的 translate
+                note.style.transform = '';
                 dragInitLeft  = parseFloat(note.style.left)  || 0;
                 dragInitTop   = parseFloat(note.style.top)   || 0;
                 dragLastX = clientX; dragLastY = clientY;
@@ -814,22 +902,28 @@
                 const note = dragNote;
                 dragNote = null;
                 dragRafId = null;
-                if (!dragHasMoved) return;
+                if (!dragHasMoved) {
+                    note.style.transition = '';
+                    return;
+                }
 
-                // 读取当前 translate 位置
-                const m = note.style.transform.match(/translate\(([^,]+)px, ([^)]+)px\)/);
-                let curX = m ? parseFloat(m[1]) : 0;
-                let curY = m ? parseFloat(m[2]) : 0;
+                // 读取当前 translate 位置（如果有）
+                let curX = dragInitLeft, curY = dragInitTop;
+                const m = note.style.transform.match(/translate\(([^,]+)px,\s*([^)]+)px\)/);
+                if (m) {
+                    curX = parseFloat(m[1]);
+                    curY = parseFloat(m[2]);
+                }
 
                 // 应用速度衰减
                 let finalX = Math.min(WALL_WIDTH-30, Math.max(-NOTE_W+30, curX + dragVX * 0.5));
                 let finalY = Math.min(WALL_HEIGHT-30, Math.max(-NOTE_H+30, curY + dragVY * 0.5));
 
-                // 写回 left/top，清除 translate，让 transition 接管
+                // 写回 left/top，清除 translate
                 note.style.left = finalX + 'px';
                 note.style.top  = finalY + 'px';
                 note.style.transform = '';
-                note.style.transition = ''; // 恢复 CSS 默认 transition
+                note.style.transition = '';  // 恢复默认
             }
 
             // wall 层统一委托 mousedown / touchstart
@@ -859,22 +953,87 @@
             function onDocMouseUp()    { noteDragEnd(); document.removeEventListener('mousemove', onDocMouseMove); }
             function onDocTouchMove(e) { e.preventDefault(); if (e.touches.length===1) noteDragMove(e.touches[0].clientX, e.touches[0].clientY); }
             function onDocTouchEnd()   { noteDragEnd(); document.removeEventListener('touchmove', onDocTouchMove); }
-            // makeDraggable 保留为空操作（createNote 仍会调用）
-            function makeDraggable(_el) { /* 已改为 wall 层事件委托，无需逐元素绑定 */ }
+            function makeDraggable(_el) { /* 事件委托，无需逐元素绑定 */ }
 
-            // 初始化便签（DocumentFragment 批量插入，只触发一次 reflow）
+            // ── zoom-control 彻底隔离所有触摸/鼠标事件 ──
+            function isolateZoomControl() {
+                const zoomCtrl = document.querySelector('.zoom-control');
+                if (!zoomCtrl) return;
+                
+                ['mousedown','touchstart','touchmove','touchend','click'].forEach(evt => {
+                    zoomCtrl.addEventListener(evt, (e) => {
+                        e.stopPropagation();  // 阻止冒泡到 wall/wrapper
+                    }, { passive: evt !== 'touchstart' && evt !== 'touchmove' });
+                });
+            }
+
+            // 初始化便签（分批渲染 + 虚拟滚动）
             function initDefaultNotes(data = null) {
                 if (!data || !data.notes) return;
-                const frag = document.createDocumentFragment();
+                
+                // 先存储所有数据，不立即渲染
+                allNotesData = [];
                 data.notes.forEach((item) => {
-                    frag.appendChild(createNote(
+                    addNoteData(
                         item.text,
-                        null, null, null,
                         item.style  || 'yellow',
                         item.author || ''
-                    ));
+                    );
                 });
-                wall.appendChild(frag);
+
+                // 大量便签时分批渲染（避免阻塞主线程）
+                if (allNotesData.length > 50) {
+                    renderInBatches();
+                } else {
+                    // 少量便签直接全渲染
+                    updateVisibleNotes();
+                }
+            }
+
+            function renderInBatches() {
+                const BATCH_SIZE = 20;  // 每批 20 个
+                let index = 0;
+                
+                function renderBatch(deadline) {
+                    // 在空闲时间渲染，每批最多 50ms
+                    const endTime = deadline ? deadline.timeRemaining() : 50;
+                    const startTime = performance.now();
+
+                    while (index < allNotesData.length && 
+                           (performance.now() - startTime) < endTime) {
+                        const data = allNotesData[index];
+                        if (isInViewport(data)) {
+                            renderNote(data);
+                        }
+                        index++;
+                    }
+
+                    // 更新进度
+                    const loadingText = document.getElementById('loadingText');
+                    if (loadingText) {
+                        const pct = Math.round((index / allNotesData.length) * 100);
+                        loadingText.textContent = `正在渲染便签... ${index}/${allNotesData.length} (${pct}%)`;
+                    }
+
+                    if (index < allNotesData.length) {
+                        if (typeof requestIdleCallback !== 'undefined') {
+                            requestIdleCallback(renderBatch);
+                        } else {
+                            setTimeout(() => renderBatch(null), 16);
+                        }
+                    } else {
+                        console.log(`✓ 已渲染 ${renderedNotes.size}/${allNotesData.length} 张便签`);
+                        const loading = document.getElementById('loadingHint');
+                        if (loading) setTimeout(() => loading.style.display = 'none', 300);
+                    }
+                }
+
+                // 启动分批渲染
+                if (typeof requestIdleCallback !== 'undefined') {
+                    requestIdleCallback(renderBatch);
+                } else {
+                    setTimeout(() => renderBatch(null), 0);
+                }
             }
 
             // 设备检测
@@ -935,8 +1094,9 @@
             }
 
             function applyWallTransform(scale) {
-                // translate(-50%, -50%) 居中 + translate(offset) 平移 + scale(s) 缩放
                 wall.style.transform = `translate(calc(-50% + ${wallTranslateX}px), calc(-50% + ${wallTranslateY}px)) scale(${scale})`;
+                // 只在虚拟滚动启用且有数据时触发
+                if (allNotesData && allNotesData.length > 50) scheduleViewportCheck();
             }
 
             // 滑块事件
@@ -956,27 +1116,63 @@
 
             // 初始化：加载便签 → 渲染 → 滚动定位
             window.addEventListener('DOMContentLoaded', () => {
-                // 手势和委托立即绑定，不等 fetch
                 makeWallDraggable();
                 initNoteDrag();
-                // 先定位，避免加载数据时页面空白
+                isolateZoomControl();  // 隔离滑块事件
                 scrollToCenter();
+
+            // ── FPS 监控（可选）──
+            if (document.getElementById('fpsCounter')) {
+                document.getElementById('fpsCounter').style.display = 'block';
+                let lastTime = performance.now();
+                let frames = 0;
+                function updateFPS() {
+                    frames++;
+                    const now = performance.now();
+                    if (now - lastTime >= 1000) {
+                        const fps = Math.round(frames * 1000 / (now - lastTime));
+                        document.getElementById('fpsValue').textContent = fps;
+                        document.getElementById('noteCount').textContent = renderedNotes.size;
+                        frames = 0;
+                        lastTime = now;
+                    }
+                    requestAnimationFrame(updateFPS);
+                }
+                updateFPS();
+            }
+
+
             });
 
             window.addEventListener('load', async () => {
                 const loading = document.getElementById('loadingHint');
+                const loadingText = document.getElementById('loadingText');
                 if (loading) loading.style.display = 'block';
+                if (loadingText) loadingText.textContent = '加载便签数据...';
+                
                 try {
                     const response = await fetch(`notes-data.json?t=${Date.now()}`);
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     const data = await response.json();
+                    
+                    if (loadingText) {
+                        loadingText.textContent = `已加载 ${data.notes?.length || 0} 张便签数据`;
+                    }
+                    
                     initDefaultNotes(data);
+                    
+                    // 少量便签时立即关闭 loading（大量便签由 renderBatch 关闭）
+                    if (!data.notes || data.notes.length <= 50) {
+                        setTimeout(() => {
+                            if (loading) loading.style.display = 'none';
+                        }, 300);
+                    }
                 } catch (error) {
                     console.warn('无法加载便签数据:', error.message);
-                } finally {
-                    if (loading) {
-                        setTimeout(() => loading.style.display = 'none', 300);
-                    }
+                    if (loadingText) loadingText.textContent = '加载失败';
+                    setTimeout(() => {
+                        if (loading) loading.style.display = 'none';
+                    }, 1500);
                 }
             });
 
@@ -1195,10 +1391,18 @@
                 wallTranslateX = Math.max(-maxX, Math.min(maxX, wallTranslateX));
                 wallTranslateY = Math.max(-maxY, Math.min(maxY, wallTranslateY));
                 applyWallTransform(currentScale);
+                if (allNotesData.length > 50) scheduleViewportCheck();
             });
         })();
     </script>
 
+
+    <!-- FPS 监控（可选，正式环境可删除） -->
+    <div id="fpsCounter" style="position:fixed; top:10px; left:10px; background:rgba(0,0,0,0.7); 
+         color:#7ec87e; padding:6px 12px; border-radius:6px; font-family:monospace; 
+         font-size:12px; z-index:30000; pointer-events:none; display:none;">
+        FPS: <span id="fpsValue">60</span> | 便签: <span id="noteCount">0</span>
+    </div>
     <!-- 加载提示 -->
     <div id="loadingHint" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); 
          background:rgba(45,36,30,0.95); color:#f7d9a0; padding:20px 32px; border-radius:16px;
@@ -1206,7 +1410,7 @@
          box-shadow:0 8px 32px rgba(0,0,0,0.6); display:none;">
         <div style="text-align:center;">
             <div style="font-size:2rem; margin-bottom:8px;">🧱</div>
-            <div>加载便签中...</div>
+            <div id="loadingText">加载便签中...</div>
         </div>
     </div>
 </body>
