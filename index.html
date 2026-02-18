@@ -675,12 +675,11 @@
 
             function isInViewport(noteData) {
                 const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
-                const scale = currentScale;
-                // wall 用 transform-origin: center，坐标系原点在墙中心
-                // 视口中心在墙坐标系的位置 = -wallTranslate / scale
-                const viewCenterX = -wallTranslateX / scale;
-                const viewCenterY = -wallTranslateY / scale;
-                // 视口在墙坐标系的左上角
+                const scale = currentScale || 1;
+                // wall 中心在视口中心，translate 是偏移量
+                const viewCenterX = WALL_WIDTH / 2 - wallTranslateX / scale;
+                const viewCenterY = WALL_HEIGHT / 2 - wallTranslateY / scale;
+                // 视口在墙坐标系的范围
                 const viewX = viewCenterX - vw / (2 * scale);
                 const viewY = viewCenterY - vh / (2 * scale);
                 const viewW = vw / scale;
@@ -690,7 +689,7 @@
                 const noteY = noteData.top  - BUFFER;
                 const noteW = 240 + BUFFER * 2;
                 const noteH = 200 + BUFFER * 2;
-                // AABB 碰撞
+                // AABB 碰撞检测
                 return !(noteX + noteW < viewX || noteX > viewX + viewW ||
                          noteY + noteH < viewY || noteY > viewY + viewH);
             }
@@ -967,11 +966,30 @@
                 });
             }
 
-            // 初始化便签（分批渲染 + 虚拟滚动）
+            // 初始化便签（少量直接渲染，大量分批+虚拟滚动）
             function initDefaultNotes(data = null) {
                 if (!data || !data.notes) return;
                 
-                // 先存储所有数据，不立即渲染
+                const noteCount = data.notes.length;
+                
+                // 少量便签（≤50）：直接全部渲染，不启用虚拟滚动
+                if (noteCount <= 50) {
+                    const frag = document.createDocumentFragment();
+                    data.notes.forEach((item) => {
+                        const note = createNote(
+                            item.text,
+                            null, null, null,
+                            item.style  || 'yellow',
+                            item.author || ''
+                        );
+                        frag.appendChild(note);
+                    });
+                    wall.appendChild(frag);
+                    console.log(`✓ 已渲染 ${noteCount} 张便签（直接模式）`);
+                    return;
+                }
+                
+                // 大量便签（>50）：启用虚拟滚动
                 allNotesData = [];
                 data.notes.forEach((item) => {
                     addNoteData(
@@ -980,14 +998,7 @@
                         item.author || ''
                     );
                 });
-
-                // 大量便签时分批渲染（避免阻塞主线程）
-                if (allNotesData.length > 50) {
-                    renderInBatches();
-                } else {
-                    // 少量便签直接全渲染
-                    updateVisibleNotes();
-                }
+                renderInBatches();
             }
 
             function renderInBatches() {
@@ -1116,10 +1127,12 @@
 
             // 初始化：加载便签 → 渲染 → 滚动定位
             window.addEventListener('DOMContentLoaded', () => {
+                console.log('🧱 便签墙初始化...');
                 makeWallDraggable();
                 initNoteDrag();
-                isolateZoomControl();  // 隔离滑块事件
+                isolateZoomControl();
                 scrollToCenter();
+                console.log('✓ 墙面就绪');
 
             // ── FPS 监控（可选）──
             if (document.getElementById('fpsCounter')) {
@@ -1155,24 +1168,26 @@
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     const data = await response.json();
                     
+                    const noteCount = data.notes?.length || 0;
                     if (loadingText) {
-                        loadingText.textContent = `已加载 ${data.notes?.length || 0} 张便签数据`;
+                        loadingText.textContent = `已加载 ${noteCount} 张便签`;
                     }
                     
                     initDefaultNotes(data);
                     
-                    // 少量便签时立即关闭 loading（大量便签由 renderBatch 关闭）
-                    if (!data.notes || data.notes.length <= 50) {
+                    // 少量便签（≤50）立即关闭 loading
+                    if (noteCount <= 50) {
                         setTimeout(() => {
                             if (loading) loading.style.display = 'none';
-                        }, 300);
+                        }, 200);
                     }
+                    // 大量便签由 renderInBatches 关闭
                 } catch (error) {
-                    console.warn('无法加载便签数据:', error.message);
-                    if (loadingText) loadingText.textContent = '加载失败';
+                    console.warn('加载便签数据失败:', error.message);
+                    if (loadingText) loadingText.textContent = '⚠️ 加载失败，请检查 notes-data.json';
                     setTimeout(() => {
                         if (loading) loading.style.display = 'none';
-                    }, 1500);
+                    }, 2000);
                 }
             });
 
