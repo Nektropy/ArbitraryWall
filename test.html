@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>便签检测工具</title>
+<script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #1e1a16;
+    color: #f0e8d8;
+    min-height: 100vh;
+    padding: 24px 16px 40px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #f7d9a0;
+    margin-bottom: 6px;
+    letter-spacing: 0.05em;
+}
+.subtitle {
+    text-align: center;
+    font-size: 0.82rem;
+    color: #9e8870;
+    margin-bottom: 28px;
+}
+
+.layout {
+    display: flex;
+    gap: 28px;
+    max-width: 900px;
+    margin: 0 auto;
+    align-items: flex-start;
+}
+
+/* ── 左侧输入区 ── */
+.panel-left {
+    flex: 1 1 400px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.field-label {
+    font-size: 0.78rem;
+    color: #c9a86c;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+}
+
+textarea {
+    width: 100%;
+    height: 160px;
+    padding: 12px 14px;
+    border: 1.5px solid #4a3a2a;
+    border-radius: 10px;
+    background: #2a2118;
+    color: #f0e8d8;
+    font-size: 0.95rem;
+    font-family: 'Segoe UI', monospace, sans-serif;
+    line-height: 1.6;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+}
+textarea:focus { border-color: #c9a86c; }
+textarea::placeholder { color: #5a4a38; }
+
+/* 字数计数器 */
+.char-count-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #2a2118;
+    border: 1.5px solid #4a3a2a;
+}
+.count-num {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    min-width: 2.5ch;
+    line-height: 1;
+    transition: color 0.2s;
+}
+.count-num.ok    { color: #7ec87e; }
+.count-num.warn  { color: #f5c842; }
+.count-num.over  { color: #ff6b6b; }
+.count-sep { color: #5a4a38; font-size: 1.2rem; }
+.count-max { color: #6a5840; font-size: 1rem; font-weight: 600; }
+.count-label { font-size: 0.8rem; color: #7a6a58; flex: 1; }
+.status-chip {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+}
+.status-chip.ok   { background: #1e3a1e; color: #7ec87e; }
+.status-chip.warn { background: #3a3010; color: #f5c842; }
+.status-chip.over { background: #3a1010; color: #ff6b6b; }
+
+/* 进度条 */
+.progress-wrap {
+    height: 4px;
+    background: #3a2e22;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+.progress-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.15s, background 0.2s;
+}
+
+/* 署名输入 */
+input[type="text"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #4a3a2a;
+    border-radius: 10px;
+    background: #2a2118;
+    color: #f0e8d8;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+input[type="text"]:focus { border-color: #c9a86c; }
+input[type="text"]::placeholder { color: #5a4a38; }
+
+/* 颜色选择器 */
+.style-section { display: flex; flex-direction: column; gap: 8px; }
+.color-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+.color-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.12s, border-color 0.12s;
+    position: relative;
+    font-size: 0;
+}
+.color-btn:hover { transform: scale(1.12); }
+.color-btn.selected { border-color: #f7d9a0; transform: scale(1.12); }
+.color-btn::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    color: #7a6a58;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+}
+.color-btn:hover::after { opacity: 1; }
+
+.custom-style-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+}
+.custom-style-row input {
+    flex: 1;
+    font-size: 0.85rem;
+    padding: 8px 12px;
+}
+.custom-style-row label {
+    font-size: 0.78rem;
+    color: #9e8870;
+    align-self: center;
+    white-space: nowrap;
+}
+
+/* JSON 输出 */
+.json-output {
+    background: #0f0d0a;
+    border: 1.5px solid #3a2e22;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.82rem;
+    color: #c9a86c;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.7;
+    position: relative;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    user-select: text;
+}
+.json-output:hover { border-color: #c9a86c; }
+.copy-hint {
+    position: absolute;
+    top: 8px; right: 10px;
+    font-size: 0.7rem;
+    color: #5a4a38;
+    font-family: sans-serif;
+}
+.copy-hint.copied { color: #7ec87e; }
+
+/* ── 右侧预览 ── */
+.panel-right {
+    flex: 0 0 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.preview-label {
+    font-size: 0.78rem;
+    color: #c9a86c;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    align-self: flex-start;
+}
+
+/* 便签预览 — 完全复用 index.html 的样式 */
+.note-preview-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0 8px;
+}
+
+.note {
+    position: relative;
+    width: 240px;
+    min-height: 200px;
+    background-color: #fffacd;
+    border-bottom: 4px solid #d4b57e;
+    border-right: 4px solid #c7a36b;
+    box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fffff0 inset;
+    padding: 18px 16px 14px 20px;
+    font-family: 'Segoe UI', 'Comic Sans MS', 'Marker Felt', cursive;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #2d241b;
+    border-radius: 5px 20px 12px 8px;
+    word-wrap: break-word;
+    overflow: hidden;
+    transform: rotate(-1.5deg);
+    transition: transform 0.3s;
+}
+.note::before {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 0 35px 35px 0;
+    border-color: transparent #cfb07c transparent transparent;
+    opacity: 0.6;
+    pointer-events: none;
+}
+.note.style-yellow { background-color: #fffacd; border-bottom-color: #d4b57e; border-right-color: #c7a36b; box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fffff0 inset; }
+.note.style-blue   { background: linear-gradient(145deg, #f0f9ff, #d6f0ff); border-bottom-color: #91d5ff; border-right-color: #69c0ff; box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #f0f9ff inset; }
+.note.style-green  { background: linear-gradient(145deg, #f9fff2, #e8f5e8); border-bottom-color: #b7eb8f; border-right-color: #95de64; box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #f9fff2 inset; }
+.note.style-pink   { background: linear-gradient(145deg, #fff5f8, #ffd6e7); border-bottom-color: #ffadd2; border-right-color: #ff85c0; box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fff5f8 inset; }
+.note.style-red    { background: linear-gradient(145deg, #fff5f5, #ffd6d6); border-bottom-color: #ff8585; border-right-color: #ff5c5c; box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fff5f5 inset; }
+.note.style-purple { background: linear-gradient(145deg, #fcf5ff, #f0d6ff); border-bottom-color: #d3adf7; border-right-color: #b37feb; box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fcf5ff inset; }
+.note.style-orange { background: linear-gradient(145deg, #fffbf0, #ffd6b3); border-bottom-color: #ffc599; border-right-color: #ffa94d; box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fffbf0 inset; }
+.note.style-teal   { background: linear-gradient(145deg, #f0fffb, #b3ffe6); border-bottom-color: #85e6d9; border-right-color: #5cdbd3; box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #f0fffb inset; }
+.note.style-indigo { background: linear-gradient(145deg, #f5f9ff, #d6e4ff); border-bottom-color: #adc6ff; border-right-color: #86a8ff; box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #f5f9ff inset; }
+.note.style-lime   { background: linear-gradient(145deg, #fdfef9, #e8f5c8); border-bottom-color: #e6ff70; border-right-color: #d3f975; box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fdfef9 inset; }
+.note.style-cyan   { background: linear-gradient(145deg, #f0ffff, #b3ffff); border-bottom-color: #85ffff; border-right-color: #5cdede; box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #f0ffff inset; }
+.note.style-amber  { background: linear-gradient(145deg, #fefcf0, #ffefb3); border-bottom-color: #ffd591; border-right-color: #ffc14d; box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fefcf0 inset; }
+.note.custom-color { border-bottom: 4px solid rgba(0,0,0,0.2); border-right: 4px solid rgba(0,0,0,0.3); box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 rgba(255,255,255,0.3) inset; }
+.note.has-image-bg { background-color: #d6e8f5; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; }
+.note.has-image-bg .note-content { background: rgba(255,255,255,0.88); padding: 10px; border-radius: 4px; backdrop-filter: blur(3px); }
+
+/* Markdown 内容 */
+.note-content { display: block; width: 100%; white-space: normal; word-break: break-word; }
+.note-content p { margin: 0 0 8px 0; }
+.note-content h1,.note-content h2,.note-content h3,.note-content h4,.note-content h5,.note-content h6 { font-weight: bold; margin: 6px 0 4px 0; line-height: 1.3; }
+.note-content h1 { font-size: 1.3em; } .note-content h2 { font-size: 1.15em; } .note-content h3 { font-size: 1.05em; }
+.note-content strong, .note-content b { font-weight: bold; }
+.note-content em, .note-content i { font-style: italic; }
+.note-content s, .note-content del { text-decoration: line-through; }
+.note-content ul, .note-content ol { margin: 4px 0 4px 18px; padding: 0; }
+.note-content ul { list-style: disc; } .note-content ol { list-style: decimal; }
+.note-content li { margin: 2px 0; }
+.note-content blockquote { border-left: 3px solid #c9a86c; margin: 6px 0 6px 4px; padding: 2px 0 2px 10px; color: #6b4f2a; font-style: italic; }
+.note-content code { background: rgba(0,0,0,0.08); padding: 1px 5px; border-radius: 3px; font-family: monospace; font-size: 0.88em; }
+.note-content pre { background: rgba(0,0,0,0.08); padding: 8px; border-radius: 4px; overflow-x: auto; margin: 6px 0; }
+.note-content pre code { background: none; padding: 0; }
+.note-content hr { border: none; border-top: 1px dashed #c9a86c; margin: 8px 0; }
+.note-content a { color: #a55808; text-decoration: underline; }
+
+/* 署名 */
+.note-author { display: block; margin-top: 10px; padding-top: 7px; border-top: 1px dashed rgba(0,0,0,0.15); font-size: 0.75rem; color: rgba(60,40,20,0.6); text-align: right; font-style: italic; font-family: 'Segoe UI', sans-serif; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 截断提示 */
+.truncate-tip {
+    font-size: 0.75rem;
+    color: #f5c842;
+    background: #2a200a;
+    border: 1px solid #5a4010;
+    border-radius: 6px;
+    padding: 7px 12px;
+    line-height: 1.5;
+    width: 100%;
+}
+
+/* 响应式 */
+@media (max-width: 680px) {
+    .layout { flex-direction: column; }
+    .panel-right { flex: none; width: 100%; align-items: center; }
+}
+</style>
+</head>
+<body>
+
+<h1>🧱 便签检测工具</h1>
+<p class="subtitle">检查字数、选择样式、预览便签效果，确认后复制 JSON 提交投稿</p>
+
+<div class="layout">
+
+  <!-- ── 左侧 ── -->
+  <div class="panel-left">
+
+    <!-- 正文 -->
+    <div>
+      <div class="field-label">✏️ 便签正文 <span style="color:#5a4a38;font-weight:400;text-transform:none;letter-spacing:0">（支持 Markdown）</span></div>
+      <textarea id="textInput" placeholder="在这里输入便签内容…&#10;&#10;支持 **粗体**、*斜体*、- 列表、[链接](url) 等 Markdown 语法。&#10;Markdown 符号和链接地址不计入字数。"></textarea>
+    </div>
+
+    <!-- 字数 -->
+    <div>
+      <div class="char-count-bar">
+        <span class="count-num ok" id="countNum">0</span>
+        <span class="count-sep">/</span>
+        <span class="count-max">100</span>
+        <span class="count-label" id="countLabel">可见字符</span>
+        <span class="status-chip ok" id="statusChip">✓ 可投稿</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar" style="width:0%;background:#7ec87e"></div>
+      </div>
+    </div>
+
+    <!-- 署名 -->
+    <div>
+      <div class="field-label">👤 署名 <span style="color:#5a4a38;font-weight:400;text-transform:none;letter-spacing:0">（可选，显示在便签右下角）</span></div>
+      <input type="text" id="authorInput" placeholder="你的昵称，留空则不显示署名" maxlength="20">
+    </div>
+
+    <!-- 颜色选择 -->
+    <div class="style-section">
+      <div class="field-label">🎨 便签样式</div>
+      <div class="color-grid" id="colorGrid"></div>
+      <div class="custom-style-row">
+        <label>自定义：</label>
+        <input type="text" id="customStyleInput" placeholder="#hex 颜色 或 http… 图片链接" style="flex:1">
+      </div>
+    </div>
+
+    <!-- JSON 输出 -->
+    <div>
+      <div class="field-label">📋 投稿 JSON <span style="color:#5a4a38;font-weight:400;text-transform:none;letter-spacing:0">（点击复制）</span></div>
+      <div class="json-output" id="jsonOutput" onclick="copyJSON()">
+        <span class="copy-hint" id="copyHint">点击复制</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── 右侧预览 ── -->
+  <div class="panel-right">
+    <div class="preview-label">👁 实时预览</div>
+    <div class="note-preview-wrap">
+      <div class="note style-yellow" id="notePreview">
+        <span class="note-content" id="previewContent"></span>
+      </div>
+    </div>
+    <div class="truncate-tip" id="truncateTip" style="display:none">
+      ⚠️ 内容超过 100 字，以下是截断后的预览效果。<br>建议精简内容后再投稿。
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── 颜色配置 ──
+const COLORS = [
+    { name: 'yellow', bg: '#fff9d0', label: '黄' },
+    { name: 'blue',   bg: '#d6f0ff', label: '蓝' },
+    { name: 'green',  bg: '#e8f5e8', label: '绿' },
+    { name: 'pink',   bg: '#ffd6e7', label: '粉' },
+    { name: 'red',    bg: '#ffd6d6', label: '红' },
+    { name: 'purple', bg: '#f0d6ff', label: '紫' },
+    { name: 'orange', bg: '#ffd6b3', label: '橙' },
+    { name: 'teal',   bg: '#b3ffe6', label: '青' },
+    { name: 'indigo', bg: '#d6e4ff', label: '靛' },
+    { name: 'lime',   bg: '#e8f5c8', label: '绿柠' },
+    { name: 'cyan',   bg: '#b3ffff', label: '湖' },
+    { name: 'amber',  bg: '#ffefb3', label: '金' },
+];
+
+const MAX_CHARS = 100;
+let currentStyle = 'yellow';
+
+// ── 构建颜色按钮 ──
+const grid = document.getElementById('colorGrid');
+COLORS.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'color-btn' + (c.name === 'yellow' ? ' selected' : '');
+    btn.style.background = c.bg;
+    btn.setAttribute('data-label', c.label);
+    btn.title = c.name;
+    btn.onclick = () => {
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.getElementById('customStyleInput').value = '';
+        currentStyle = c.name;
+        updatePreview();
+    };
+    grid.appendChild(btn);
+});
+
+// ── 字数计算（与 index.html 逻辑完全一致）──
+function countVisible(text) {
+    if (!text) return 0;
+    return text
+        .replace(/!?\[([^\]]*?)\]\([^)]*?\)/g, '$1')
+        .replace(/```[\s\S]*?```/g, m => m.slice(3,-3).trim())
+        .replace(/`([^`]*?)`/g, '$1')
+        .replace(/^#{1,6}\s+/gm, '')
+        .replace(/[*_~]{1,3}/g, '')
+        .replace(/^>\s*/gm, '')
+        .replace(/^[-*+]\s+/gm, '')
+        .replace(/^\d+\.\s+/gm, '')
+        .replace(/^[-*_]{3,}\s*$/gm, '')
+        .replace(/\n/g, '')
+        .length;
+}
+
+function truncateText(text) {
+    if (!text) return '';
+    if (countVisible(text) <= MAX_CHARS) return text;
+    let visible = 0, i = 0;
+    while (i < text.length && visible < MAX_CHARS) {
+        const rest = text.slice(i);
+        let m;
+        if ((m = rest.match(/^!?\[([^\]]*?)\]\([^)]*?\)/))) { visible += m[1].length; i += m[0].length; continue; }
+        if ((m = rest.match(/^```[\s\S]*?```/))) { visible += m[0].slice(3,-3).trim().replace(/\n/g,'').length; i += m[0].length; continue; }
+        if ((m = rest.match(/^`([^`]*?)`/))) { visible += m[1].length; i += m[0].length; continue; }
+        if ((m = rest.match(/^#{1,6}\s+/))) { i += m[0].length; continue; }
+        if ((m = rest.match(/^[*_~]{1,3}/))) { i += m[0].length; continue; }
+        if ((m = rest.match(/^>\s*/))) { i += m[0].length; continue; }
+        if ((m = rest.match(/^[-*+]\s+|^\d+\.\s+/))) { i += m[0].length; continue; }
+        if ((m = rest.match(/^[-*_]{3,}\s*\n/))) { i += m[0].length; continue; }
+        if (text[i] === '\n') { i++; continue; }
+        visible++; i++;
+    }
+    return text.slice(0, i) + '…';
+}
+
+// ── 辅助：颜色调亮/调暗 ──
+function lightenColor(hex, p) {
+    const n = parseInt(hex.replace('#',''),16), a = Math.round(2.55*p);
+    const r=(n>>16)+a, g=(n>>8&0xFF)+a, b=(n&0xFF)+a;
+    return '#'+(0x1000000+(r<255?r<1?0:r:255)*0x10000+(g<255?g<1?0:g:255)*0x100+(b<255?b<1?0:b:255)).toString(16).slice(1);
+}
+function darkenColor(hex, p) {
+    const n = parseInt(hex.replace('#',''),16), a = Math.round(2.55*p);
+    const r=(n>>16)-a, g=(n>>8&0xFF)-a, b=(n&0xFF)-a;
+    return '#'+(0x1000000+(r>255?255:r<0?0:r)*0x10000+(g>255?255:g<0?0:g)*0x100+(b>255?255:b<0?0:b)).toString(16).slice(1);
+}
+
+// ── 主更新函数 ──
+function updatePreview() {
+    const rawText  = document.getElementById('textInput').value;
+    const author   = document.getElementById('authorInput').value.trim();
+    const customSt = document.getElementById('customStyleInput').value.trim();
+
+    // 字数
+    const cnt = countVisible(rawText);
+    const numEl  = document.getElementById('countNum');
+    const chipEl = document.getElementById('statusChip');
+    const bar    = document.getElementById('progressBar');
+    const pct    = Math.min(cnt / MAX_CHARS * 100, 100);
+    numEl.textContent = cnt;
+    bar.style.width = pct + '%';
+
+    if (cnt === 0) {
+        numEl.className = 'count-num ok';
+        chipEl.className = 'status-chip ok'; chipEl.textContent = '— 请输入内容';
+        bar.style.background = '#3a2e22';
+    } else if (cnt <= MAX_CHARS * 0.8) {
+        numEl.className = 'count-num ok';
+        chipEl.className = 'status-chip ok'; chipEl.textContent = '✓ 可投稿';
+        bar.style.background = '#7ec87e';
+    } else if (cnt <= MAX_CHARS) {
+        numEl.className = 'count-num warn';
+        chipEl.className = 'status-chip warn'; chipEl.textContent = '⚡ 接近上限';
+        bar.style.background = '#f5c842';
+    } else {
+        numEl.className = 'count-num over';
+        chipEl.className = 'status-chip over'; chipEl.textContent = '✗ 超出上限';
+        bar.style.background = '#ff6b6b';
+    }
+
+    // 截断
+    const isOver = cnt > MAX_CHARS;
+    document.getElementById('truncateTip').style.display = isOver ? '' : 'none';
+    const displayText = isOver ? truncateText(rawText) : rawText;
+
+    // 样式
+    const note = document.getElementById('notePreview');
+    note.className = 'note';
+    const effectiveStyle = customSt || currentStyle;
+
+    if (customSt) {
+        if (customSt.startsWith('http') || customSt.startsWith('//')) {
+            note.classList.add('has-image-bg');
+            note.style.backgroundImage = `url("${customSt}")`;
+            note.style.backgroundColor = '';
+            note.style.background = '';
+        } else if (customSt.startsWith('#') && /^#[0-9a-fA-F]{3,6}$/.test(customSt)) {
+            note.classList.add('custom-color');
+            note.style.background = `linear-gradient(145deg, ${lightenColor(customSt,5)}, ${darkenColor(customSt,5)})`;
+            note.style.backgroundImage = '';
+        } else {
+            note.classList.add('style-yellow');
+            note.style.cssText = '';
+        }
+    } else {
+        note.classList.add('style-' + currentStyle);
+        note.style.background = '';
+        note.style.backgroundImage = '';
+        note.style.backgroundColor = '';
+    }
+
+    // 内容渲染
+    const contentEl = document.getElementById('previewContent');
+    if (typeof marked !== 'undefined' && rawText.trim()) {
+        contentEl.innerHTML = marked.parse(displayText);
+    } else {
+        contentEl.textContent = displayText || '（便签内容预览）';
+    }
+
+    // 署名
+    let authorEl = note.querySelector('.note-author');
+    if (author) {
+        if (!authorEl) {
+            authorEl = document.createElement('span');
+            authorEl.className = 'note-author';
+            note.appendChild(authorEl);
+        }
+        authorEl.textContent = '— ' + author;
+    } else {
+        if (authorEl) authorEl.remove();
+    }
+
+    // JSON 输出
+    updateJSON(rawText, effectiveStyle, author);
+}
+
+function updateJSON(text, style, author) {
+    const obj = { text };
+    if (style && style !== 'yellow') obj.style = style;
+    else obj.style = style || 'yellow';
+    if (author) obj.author = author;
+
+    const jsonStr = JSON.stringify(obj, null, 2);
+    const out = document.getElementById('jsonOutput');
+    // 语法高亮（简易）
+    const highlighted = jsonStr
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"([^"]+)":/g, '<span style="color:#adc6ff">"$1"</span>:')
+        .replace(/: "([^"]*)"/g, ': <span style="color:#c9a86c">"$1"</span>');
+    out.innerHTML = `<span class="copy-hint" id="copyHint">点击复制</span>${highlighted}`;
+    out._rawJSON = jsonStr;
+}
+
+function copyJSON() {
+    const out = document.getElementById('jsonOutput');
+    const text = out._rawJSON || '';
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+        const hint = document.getElementById('copyHint');
+        if (hint) { hint.textContent = '✓ 已复制！'; hint.className = 'copy-hint copied'; }
+        setTimeout(() => {
+            const h = document.getElementById('copyHint');
+            if (h) { h.textContent = '点击复制'; h.className = 'copy-hint'; }
+        }, 1800);
+    }).catch(() => {
+        // 降级：选中文本
+        const r = document.createRange();
+        r.selectNodeContents(out);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(r);
+    });
+}
+
+// ── 事件绑定 ──
+document.getElementById('textInput').addEventListener('input', updatePreview);
+document.getElementById('authorInput').addEventListener('input', updatePreview);
+document.getElementById('customStyleInput').addEventListener('input', () => {
+    // 自定义时取消颜色按钮选中
+    if (document.getElementById('customStyleInput').value.trim()) {
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+    }
+    updatePreview();
+});
+
+// 初始化
+updatePreview();
+</script>
+</body>
+</html>
