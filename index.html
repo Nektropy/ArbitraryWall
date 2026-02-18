@@ -1,1213 +1,349 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>便签投稿墙</title>
-    <!-- 性能优化 -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <link rel="dns-prefetch" href="https://www.transparenttextures.com">
-    <!-- 使用 marked 解析 Markdown (轻量, 安全) -->
-    <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js" defer></script>
-    <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-        }
-        body {
-            background: #2d241e;
-            font-family: 'Segoe UI', 'Comic Sans MS', 'Chalkboard', cursive, sans-serif;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            touch-action: pan-x pan-y pinch-zoom; /* 允许单指平移 + 双指缩放 */
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>便签墙</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      overflow: hidden;
+      background: #f0f2f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      height: 100vh;
+      touch-action: none; /* 阻止默认双指缩放 */
+    }
 
-        /* 全屏容器 */
-        .wall-wrapper {
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;  /* 完全禁用滚动，用 transform 控制 */
-            position: relative;
-            touch-action: none;
-            background: linear-gradient(to bottom, #87ceeb, #b0e0e6);
-            cursor: grab;
-        }
-        .wall-wrapper:active {
-            cursor: grabbing;
-        }
+    /* 墙体容器 */
+    .wall-wrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
 
-        /* 巨墙 — 背景图片链接在此修改 */
-        .wall {
-            position: absolute;
-            left: 50%; top: 50%;
-            width: 10000px;
-            height: 10000px;
-            background-image: url('https://www.transparenttextures.com/patterns/old-wall.png');
-            background-color: #b08a67;
-            background-repeat: repeat;
-            background-size: 300px 300px;
-            box-shadow: inset 0 0 0 4px #5a3f2e;
-            transform-origin: center center;  /* 中心缩放，配合 translate(-50%, -50%) */
-            transform: translate(-50%, -50%) scale(1);
-            will-change: transform;
-            cursor: grab;
-            backface-visibility: hidden;  /* 强制 GPU 层 */
-            -webkit-backface-visibility: hidden;
-        }
-        .wall:active {
-            cursor: grabbing;
-        }
-        
+    .wall {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-origin: 0 0;
+      will-change: transform;
+      backface-visibility: hidden;
+      transform: translate(-50%, -50%) scale(1) translateZ(0);
+    }
 
+    /* 便签样式 */
+    .note {
+      position: absolute;
+      width: 180px;
+      min-height: 120px;
+      padding: 8px;
+      background: #fffde7;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      border-radius: 4px;
+      cursor: move;
+      user-select: text;
+      contain: layout style paint;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform-origin: 0 0;
+    }
 
-        /* 便签统一样式 — 尺寸可修改 */
-        .note {
-            position: absolute;
-            width: 240px;
-            min-height: 200px;
-            background-color: #fffacd;
-            border-bottom: 4px solid #d4b57e;
-            border-right: 4px solid #c7a36b;
-            box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fffff0 inset;
-            padding: 18px 16px 32px 20px;  /* bottom 留给署名行 */
-            font-family: 'Segoe UI', 'Comic Sans MS', 'Marker Felt', cursive;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            color: #2d241b;
-            border-radius: 5px 20px 12px 8px;
-            transform-origin: 0 0;
-            transition: transform 0.25s ease-out, box-shadow 0.1s, filter 0.1s;
-            cursor: grab;
-            word-wrap: break-word;
-            z-index: 1;
-            will-change: transform;  /* 改为 transform，拖动用 translate */
-            overflow: hidden;
-            touch-action: none;
-            contain: layout style;   /* 隔离 reflow 影响 */
-        }
-        
-        /* 带图片背景的便签 */
-        .note.has-image-bg {
-            background-color: #d6e8f5; /* 图片加载前/失败的降级色 */
-            background-size: cover !important;
-            background-position: center !important;
-            background-repeat: no-repeat !important;
-            position: relative;
-        }
-        /* 图片加载失败时的提示 */
-        .note.has-image-bg.img-error {
-            background-color: #f0e8d8;
-            background-image: none !important;
-        }
-        .note.has-image-bg.img-error::after {
-            content: "🖼️";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2rem;
-            opacity: 0.3;
-            pointer-events: none;
-        }
-        
-        /* 图片背景便签的内容覆盖层 */
-        .note.has-image-bg .note-content {
-            background: rgba(255, 255, 255, 0.88);
-            padding: 15px;
-            border-radius: 4px;
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
-        }
-        
-        /* 便签样式 - yellow */
-        .note.style-yellow {
-            background-color: #fffacd; /* 各 style-* / has-image-bg 类会覆盖 */
-            border-bottom: 4px solid #d4b57e;
-            border-right: 4px solid #c7a36b;
-            box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fffff0 inset;
-        }
-        
-        /* 便签样式 - blue */
-        .note.style-blue {
-            background: #e6f7ff;
-            background: linear-gradient(145deg, #f0f9ff, #d6f0ff);
-            border-bottom: 4px solid #91d5ff;
-            border-right: 4px solid #69c0ff;
-            box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #f0f9ff inset;
-        }
-        
-        /* 便签样式 - green */
-        .note.style-green {
-            background: #f6ffed;
-            background: linear-gradient(145deg, #f9fff2, #e8f5e8);
-            border-bottom: 4px solid #b7eb8f;
-            border-right: 4px solid #95de64;
-            box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #f9fff2 inset;
-        }
-        
-        /* 便签样式 - pink */
-        .note.style-pink {
-            background: #fff0f6;
-            background: linear-gradient(145deg, #fff5f8, #ffd6e7);
-            border-bottom: 4px solid #ffadd2;
-            border-right: 4px solid #ff85c0;
-            box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fff5f8 inset;
-        }
-        
-        /* 便签样式 - red */
-        .note.style-red {
-            background: #fff0f0;
-            background: linear-gradient(145deg, #fff5f5, #ffd6d6);
-            border-bottom: 4px solid #ff8585;
-            border-right: 4px solid #ff5c5c;
-            box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fff5f5 inset;
-        }
-        
-        /* 便签样式 - purple */
-        .note.style-purple {
-            background: #f9f0ff;
-            background: linear-gradient(145deg, #fcf5ff, #f0d6ff);
-            border-bottom: 4px solid #d3adf7;
-            border-right: 4px solid #b37feb;
-            box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fcf5ff inset;
-        }
-        
-        /* 便签样式 - orange */
-        .note.style-orange {
-            background: #fff7e6;
-            background: linear-gradient(145deg, #fffbf0, #ffd6b3);
-            border-bottom: 4px solid #ffc599;
-            border-right: 4px solid #ffa94d;
-            box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fffbf0 inset;
-        }
-        
-        /* 便签样式 - teal */
-        .note.style-teal {
-            background: #e6fffb;
-            background: linear-gradient(145deg, #f0fffb, #b3ffe6);
-            border-bottom: 4px solid #85e6d9;
-            border-right: 4px solid #5cdbd3;
-            box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #f0fffb inset;
-        }
-        
-        /* 便签样式 - indigo */
-        .note.style-indigo {
-            background: #f0f5ff;
-            background: linear-gradient(145deg, #f5f9ff, #d6e4ff);
-            border-bottom: 4px solid #adc6ff;
-            border-right: 4px solid #86a8ff;
-            box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #f5f9ff inset;
-        }
-        
-        /* 便签样式 - lime */
-        .note.style-lime {
-            background: #fafff0;
-            background: linear-gradient(145deg, #fdfef9, #e8f5c8);
-            border-bottom: 4px solid #e6ff70;
-            border-right: 4px solid #d3f975;
-            box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fdfef9 inset;
-        }
-        
-        /* 便签样式 - cyan */
-        .note.style-cyan {
-            background: #e6ffff;
-            background: linear-gradient(145deg, #f0ffff, #b3ffff);
-            border-bottom: 4px solid #85ffff;
-            border-right: 4px solid #5cdede;
-            box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #f0ffff inset;
-        }
-        
-        /* 便签样式 - amber */
-        .note.style-amber {
-            background: #fffbe6;
-            background: linear-gradient(145deg, #fefcf0, #ffefb3);
-            border-bottom: 4px solid #ffd591;
-            border-right: 4px solid #ffc14d;
-            box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 #fefcf0 inset;
-        }
-        
-        /* 自定义颜色便签 */
-        .note.custom-color {
-            border-bottom: 4px solid rgba(0,0,0,0.2);
-            border-right: 4px solid rgba(0,0,0,0.3);
-            box-shadow: 6px 6px 15px rgba(0,0,0,0.4), 0 2px 0 rgba(255,255,255,0.3) inset;
-        }
-        .note:hover {
-            filter: brightness(1.02);
-            box-shadow: 10px 10px 22px rgba(0,0,0,0.5), 0 0 0 2px #fceeb6;
-            cursor: grab;
-        }
-        .note:active {
-            cursor: grabbing;
-            z-index: 9999 !important;
-            box-shadow: 14px 14px 25px rgba(0,0,0,0.6);
-        }
-        /* 小折角 */
-        .note::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 0 35px 35px 0;
-            border-color: transparent #cfb07c transparent transparent;
-            opacity: 0.6;
-            pointer-events: none;
-        }
-        /* 便签内容区域 — 渲染 Markdown */
-        .note-content {
-            display: block;
-            width: 100%;
-            white-space: normal;
-            word-break: break-word;
-        }
-        /* ── 还原被 * {margin:0;padding:0} 清零的 Markdown 元素样式 ── */
-        .note-content p {
-            margin: 0 0 8px 0;
-        }
-        .note-content h1, .note-content h2, .note-content h3,
-        .note-content h4, .note-content h5, .note-content h6 {
-            font-weight: bold;
-            margin: 6px 0 4px 0;
-            line-height: 1.3;
-        }
-        .note-content h1 { font-size: 1.3em; }
-        .note-content h2 { font-size: 1.15em; }
-        .note-content h3 { font-size: 1.05em; }
-        .note-content strong, .note-content b { font-weight: bold; }
-        .note-content em, .note-content i { font-style: italic; }
-        .note-content s, .note-content del { text-decoration: line-through; }
-        .note-content ul, .note-content ol {
-            margin: 4px 0 4px 18px;
-            padding: 0;
-        }
-        .note-content ul { list-style: disc; }
-        .note-content ol { list-style: decimal; }
-        .note-content li { margin: 2px 0; }
-        .note-content blockquote {
-            border-left: 3px solid #c9a86c;
-            margin: 6px 0 6px 4px;
-            padding: 2px 0 2px 10px;
-            color: #6b4f2a;
-            font-style: italic;
-        }
-        .note-content code {
-            background: rgba(0,0,0,0.08);
-            padding: 1px 5px;
-            border-radius: 3px;
-            font-family: monospace;
-            font-size: 0.88em;
-        }
-        .note-content pre {
-            background: rgba(0,0,0,0.08);
-            padding: 8px;
-            border-radius: 4px;
-            overflow-x: auto;
-            margin: 6px 0;
-        }
-        .note-content pre code {
-            background: none;
-            padding: 0;
-        }
-        .note-content hr {
-            border: none;
-            border-top: 1px dashed #c9a86c;
-            margin: 8px 0;
-        }
-        .note-content a {
-            color: #a55808;
-            text-decoration: underline;
-            cursor: pointer;
-        }
+    /* 缩放控制条 */
+    .zoom-control {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      width: 200px;
+      background: white;
+      padding: 8px;
+      border-radius: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      pointer-events: auto;
+      will-change: transform;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
 
+    .zoom-control input {
+      width: 100%;
+    }
 
-        /* 便签署名 — 绝对定位固定于右下角 */
-        .note-author {
-            position: absolute;
-            bottom: 8px;
-            right: 12px;
-            left: 20px;         /* 左边界，防止长名字溢出 */
-            font-size: 0.72rem;
-            color: rgba(60,40,20,0.55);
-            text-align: right;
-            font-style: italic;
-            font-family: 'Segoe UI', sans-serif;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            pointer-events: none;
-            border-top: 1px dashed rgba(0,0,0,0.12);
-            padding-top: 4px;
-            line-height: 1.3;
-        }
-
-        /* 缩放控制条 — 右下角固定，移动端友好 */
-        .zoom-control {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(45, 36, 30, 0.9);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 12px 20px;
-            border-radius: 40px;
-            border: 2px solid #bb9d7b;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            z-index: 20000;
-            color: #f7e3c2;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-            font-size: 1rem;
-            touch-action: manipulation;
-        }
-        .zoom-control label {
-            font-size: 1.3rem;
-            font-weight: bold;
-            line-height: 1;
-        }
-        .zoom-control input {
-            width: 200px;
-            height: 10px;
-            background: #4f3e2e;
-            border-radius: 20px;
-            -webkit-appearance: none;
-            appearance: none;
-            outline: none;
-            touch-action: manipulation;
-        }
-        .zoom-control input::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 28px;
-            height: 28px;
-            background: #f7d9a0;
-            border-radius: 50%;
-            border: 2px solid #7b5b3e;
-            box-shadow: 0 2px 8px black;
-            cursor: grab;
-            touch-action: manipulation;
-        }
-        .zoom-control input::-moz-range-thumb {
-            width: 28px;
-            height: 28px;
-            background: #f7d9a0;
-            border-radius: 50%;
-            border: 2px solid #7b5b3e;
-            cursor: grab;
-            touch-action: manipulation;
-        }
-        .zoom-control span {
-            min-width: 65px;
-            font-size: 1.3rem;
-            background: #2d1f14;
-            padding: 5px 12px;
-            border-radius: 40px;
-            text-align: center;
-            border: 1px solid #c8a87c;
-        }
-
-        /* 信息弹窗 */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 300000;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            padding: 15px;
-        }
-        .modal-box {
-            background: #fef7e9;
-            max-width: 500px;
-            width: 100%;
-            padding: 25px 20px;
-            border-radius: 40px 15px 40px 15px;
-            box-shadow: 0 30px 40px rgba(0,0,0,0.6), 0 10px 0 #bc9f7e inset;
-            text-align: left;
-            border: 5px solid #dac29c;
-            font-size: 1rem;
-            color: #3f2e1f;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .modal-box h2 {
-            margin: 0 0 15px 0;
-            font-weight: 400;
-            color: #4a3322;
-            font-size: 2rem;
-            border-bottom: 2px dashed #b48c65;
-            padding-bottom: 8px;
-        }
-        .modal-box ul {
-            margin: 15px 0;
-            padding-left: 25px;
-        }
-        .modal-box li {
-            margin: 8px 0;
-        }
-        .modal-box code {
-            background: #2d241e;
-            color: #fadfad;
-            padding: 2px 8px;
-            border-radius: 30px;
-            font-family: monospace;
-            font-size: 0.85rem;
-        }
-        .modal-close {
-            background: #b48c65;
-            border: none;
-            border-bottom: 5px solid #7b5b3e;
-            padding: 12px 30px;
-            border-radius: 40px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            transition: all 0.1s;
-            margin-top: 15px;
-            display: block;
-            margin-left: auto;
-            touch-action: manipulation;
-        }
-        .modal-close:active {
-            transform: translateY(4px);
-            border-bottom-width: 2px;
-        }
-        .hidden {
-            display: none;
-        }
-
-        /* 移动端调整滑块宽度 */
-        @media (max-width: 600px) {
-            .zoom-control {
-                padding: 10px 15px;
-                gap: 10px;
-                bottom: 15px;
-                right: 15px;
-            }
-            .zoom-control input {
-                width: 130px;
-            }
-            .zoom-control span {
-                min-width: 55px;
-                font-size: 1.1rem;
-            }
-            .zoom-control label {
-                font-size: 1.1rem;
-            }
-        }
-    
-        /* 移动端优化 */
-        @media (max-width: 768px) {
-            .note {
-                font-size: 1rem;        /* 字号稍大，触摸友好 */
-                min-height: 180px;
-            }
-            .zoom-control {
-                bottom: 16px;
-                right: 16px;
-                padding: 10px 16px;
-                font-size: 0.9rem;
-            }
-            .zoom-control input {
-                width: 140px;
-            }
-        }
-</style>
+    /* 弹窗 */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s;
+    }
+    .modal.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 90%;
+    }
+    .modal h2 {
+      margin-bottom: 12px;
+    }
+    .modal p {
+      line-height: 1.5;
+    }
+    .close-btn {
+      margin-top: 12px;
+      padding: 6px 12px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <!-- 滚动容器 -->
-    <div class="wall-wrapper" id="wallWrapper">
-        <!-- 巨墙 (10000x10000) -->
-        <div class="wall" id="wall"></div>
-    </div>
-
-    <!-- 缩放滑块 (右下角) -->
-    <div class="zoom-control">
-        <label>🔍</label>
-        <input type="range" id="zoomSlider" min="0.2" max="3" step="0.02" value="1">
-        <span id="zoomPercent">100%</span>
-    </div>
-
-    <!-- 弹窗 (使用说明) -->
-    <div class="modal-overlay" id="infoModal">
-        <div class="modal-box">
-            <h2>🧱 便签投稿墙</h2>
-            <ul>
-                <li><strong>➕ 添加投稿</strong>：在 <code>notes-data.json</code> 的 <code>notes</code> 数组追加新对象。</li>
-                <li><strong>👤 署名字段</strong>：<code>author</code>（昵称）、<code>avatar</code>（头像链接）、<code>from</code>（来源平台）。</li>
-                <li><strong>🎨 便签颜色</strong>：<code>style</code> 填颜色名（yellow/blue…）、<code>#hex</code> 或图片链接。</li>
-                <li><strong>📝 支持 Markdown</strong>：粗体、斜体、列表、链接、代码块均可用。</li>
-                <li><strong>🔍 缩放</strong>：右下角滑块 / 鼠标滚轮 / 移动端双指。</li>
-                <li><strong>🖱️ 拖动</strong>：单指/鼠标拖动墙面，便签也可单独拖拽。</li>
-            </ul>
-            <button class="modal-close" id="closeModalBtn">开始探索 🚀</button>
-        </div>
-    </div>
-    </div>
-
-    <script>
-        (function() {
-            // 墙面大小配置 - 可以轻松修改这里来改变墙面尺寸
-            const WALL_WIDTH = 10000;
-            const WALL_HEIGHT = 10000;
-
-            const wall = document.getElementById('wall');
-            const wrapper = document.getElementById('wallWrapper');
-            const slider = document.getElementById('zoomSlider');
-            const zoomSpan = document.getElementById('zoomPercent');
-
-            // 设置墙面大小
-            wall.style.width = WALL_WIDTH + 'px';
-            wall.style.height = WALL_HEIGHT + 'px';
-
-            let maxZIndex = 1000;
-            let currentScale = 1.0; // 当前缩放值
-
-            // 工具函数：随机范围
-            const random = (min, max) => Math.random() * (max - min) + min;
-
-            // ── 可见字符计数：剥离所有 Markdown 语法符号和 URL，只数实际内容 ──
-            const MAX_CHARS = 100;
-            function countVisible(text) {
-                if (!text) return 0;
-                return text
-                    .replace(/!?\[([^\]]*?)\]\([^)]*?\)/g, '$1') // 链接/图片：只保留显示文字
-                    .replace(/```[\s\S]*?```/g, m => m.slice(3, -3).trim()) // 代码块
-                    .replace(/`([^`]*?)`/g, '$1')   // 行内代码
-                    .replace(/^#{1,6}\s+/gm, '')     // 标题符号
-                    .replace(/[*_~]{1,3}/g, '')      // 粗体/斜体/删除线符号
-                    .replace(/^>\s*/gm, '')           // 引用符号
-                    .replace(/^[-*+]\s+/gm, '')       // 无序列表符号
-                    .replace(/^\d+\.\s+/gm, '')       // 有序列表符号
-                    .replace(/^[-*_]{3,}\s*$/gm, '')  // 水平线
-                    .replace(/\n/g, '')               // 换行不计字数
-                    .length;
-            }
-
-            function truncateText(text) {
-                if (!text) return '';
-                if (countVisible(text) <= MAX_CHARS) return text;
-                // 逐步扫描原文，跳过不计字数的部分，达到上限时截断
-                let visible = 0;
-                let i = 0;
-                while (i < text.length && visible < MAX_CHARS) {
-                    const rest = text.slice(i);
-                    let m;
-                    // 链接/图片 [显示文字](url) → 只计显示文字
-                    if ((m = rest.match(/^!?\[([^\]]*?)\]\([^)]*?\)/))) {
-                        visible += m[1].length; i += m[0].length; continue;
-                    }
-                    // 代码块 ```...```
-                    if ((m = rest.match(/^```[\s\S]*?```/))) {
-                        visible += m[0].slice(3,-3).trim().replace(/\n/g,'').length;
-                        i += m[0].length; continue;
-                    }
-                    // 行内代码 `...`
-                    if ((m = rest.match(/^`([^`]*?)`/))) {
-                        visible += m[1].length; i += m[0].length; continue;
-                    }
-                    // 标题符号 # ## ...（行首）
-                    if ((m = rest.match(/^#{1,6}\s+/))) { i += m[0].length; continue; }
-                    // 粗体/斜体/删除线符号
-                    if ((m = rest.match(/^[*_~]{1,3}/))) { i += m[0].length; continue; }
-                    // 引用符号 > （行首）
-                    if ((m = rest.match(/^>\s*/))) { i += m[0].length; continue; }
-                    // 列表符号（行首）
-                    if ((m = rest.match(/^[-*+]\s+|^\d+\.\s+/))) { i += m[0].length; continue; }
-                    // 水平线
-                    if ((m = rest.match(/^[-*_]{3,}\s*\n/))) { i += m[0].length; continue; }
-                    // 换行不计
-                    if (text[i] === '\n') { i++; continue; }
-                    visible++;
-                    i++;
-                }
-                return text.slice(0, i) + '…';
-            }
-
-            // Markdown 渲染（带缓存）
-            function renderMarkdown(text) {
-                if (typeof marked === 'undefined') return text;
-                if (!mdCache.has(text)) {
-                    try { mdCache.set(text, marked.parse(text)); } catch(e) { mdCache.set(text, text); }
-                }
-                return mdCache.get(text);
-            }
-
-            // marked 就绪后重新渲染（带缓存，避免重复解析）
-            const mdCache = new Map();
-            function rewireMarkdown() {
-                if (typeof marked === 'undefined') return;
-                document.querySelectorAll('.note-content[data-raw]').forEach(el => {
-                    const raw = el.dataset.raw;
-                    if (!mdCache.has(raw)) {
-                        try { mdCache.set(raw, marked.parse(raw)); } catch(e) { mdCache.set(raw, raw); }
-                    }
-                    el.innerHTML = mdCache.get(raw);
-                    delete el.dataset.raw;
-                });
-            }
-            document.querySelector('script[src*="marked"]')
-                ?.addEventListener('load', rewireMarkdown);
-
-
-            // ── 图片背景懒加载（Intersection Observer）──
-            let imgObserver = null;
-            function initImgObserver() {
-                if (imgObserver) return;
-                imgObserver = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const note = entry.target;
-                            const imgUrl = note.dataset.bgImg;
-                            if (imgUrl) {
-                                const img = new Image();
-                                img.onload = () => {
-                                    note.style.setProperty('background-image', `url("${imgUrl}")`, 'important');
-                                    delete note.dataset.bgImg;
-                                };
-                                img.onerror = () => note.classList.add('img-error');
-                                img.src = imgUrl;
-                                imgObserver.unobserve(note);
-                            }
-                        }
-                    });
-                }, { rootMargin: '100px' });  // 提前 100px 开始加载
-            }
-
-            // 创建便签（支持 style：颜色名 / #hex / 图片链接，以及可选 author 署名）
-            function createNote(mdText, left, top, rotate = null, style = 'yellow', author = '') {
-                const note = document.createElement('div');
-                note.className = 'note';
-
-                // ── 背景样式 ──
-                if (typeof style === 'string') {
-                    if (style.startsWith('http') || style.startsWith('//')) {
-                        note.classList.add('has-image-bg');
-                        note.dataset.bgImg = style;  // 存到 data 属性，延迟加载
-                        initImgObserver();
-                        imgObserver.observe(note);  // 进入视口后才加载
-                    } else if (style.startsWith('#')) {
-                        note.classList.add('custom-color');
-                        note.style.background = `linear-gradient(145deg, ${lightenColor(style, 5)}, ${darkenColor(style, 5)})`;
-                    } else {
-                        note.classList.add(`style-${style}`);
-                    }
-                } else {
-                    note.classList.add('style-yellow');
-                }
-
-                // ── 旋转 & 位置 ──
-                const rot = (rotate !== null) ? rotate : random(-5, 6);
-                note.style.transform = `rotate(${rot}deg)`;
-                const noteLeft = left !== null ? left : random(200, WALL_WIDTH - 200);
-                const noteTop  = top  !== null ? top  : random(200, WALL_HEIGHT - 200);
-                note.style.left = noteLeft + 'px';
-                note.style.top  = noteTop  + 'px';
-                note.style.zIndex = Math.floor(random(10, 500));
-
-                // ── 正文内容 ──
-                const contentSpan = document.createElement('span');
-                contentSpan.className = 'note-content';
-                const truncated = truncateText(mdText);
-                const html = renderMarkdown(truncated);
-                contentSpan.innerHTML = html;
-                // 若 marked 尚未就绪（defer），保存原文供 rewireMarkdown 补渲染
-                if (html === truncated && truncated.trim()) {
-                    contentSpan.dataset.raw = truncated;
-                }
-                note.appendChild(contentSpan);
-
-                // ── 署名（有 author 时显示）──
-                if (author && author.trim()) {
-                    const authorEl = document.createElement('span');
-                    authorEl.className = 'note-author';
-                    authorEl.textContent = '— ' + author.trim();
-                    note.appendChild(authorEl);
-                }
-
-                makeDraggable(note);
-                return note;
-            }
-            
-            // 辅助函数：调整颜色亮度
-            function lightenColor(color, percent) {
-                const num = parseInt(color.replace("#", ""), 16);
-                const amt = Math.round(2.55 * percent);
-                const R = (num >> 16) + amt;
-                const G = (num >> 8 & 0x00FF) + amt;
-                const B = (num & 0x0000FF) + amt;
-                return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255)).toString(16).slice(1);
-            }
-            
-            function darkenColor(color, percent) {
-                const num = parseInt(color.replace("#", ""), 16);
-                const amt = Math.round(2.55 * percent);
-                const R = (num >> 16) - amt;
-                const G = (num >> 8 & 0x00FF) - amt;
-                const B = (num & 0x0000FF) - amt;
-                return "#" + (0x1000000 + (R>255?255:R<0?0:R)*0x10000 + (G>255?255:G<0?0:G)*0x100 + (B>255?255:B<0?0:B)).toString(16).slice(1);
-            }
-
-            // ── 便签拖拽：事件委托到 wall，避免 N 张便签 × 2 个监听器 ──
-            // 拖拽状态（全局单例，同时只能拖一张）
-            let dragNote = null, dragStartX = 0, dragStartY = 0;
-            let dragInitLeft = 0, dragInitTop = 0;
-            let dragHasMoved = false;
-            let dragVX = 0, dragVY = 0, dragLastX = 0, dragLastY = 0, dragLastT = 0;
-            let dragRafId = null;
-            // 预存便签尺寸，避免拖动中反复触发 layout
-            const NOTE_W = 240, NOTE_H = 200;
-
-            function noteDragStart(note, clientX, clientY) {
-                dragNote = note;
-                dragStartX = clientX; dragStartY = clientY;
-                dragInitLeft  = parseFloat(note.style.left)  || 0;
-                dragInitTop   = parseFloat(note.style.top)   || 0;
-                dragLastX = clientX; dragLastY = clientY;
-                dragLastT = Date.now();
-                dragVX = 0; dragVY = 0;
-                dragHasMoved = false;
-                maxZIndex++;
-                note.style.zIndex = maxZIndex;
-                note.style.transition = 'none';
-            }
-
-            function noteDragMove(clientX, clientY) {
-                if (!dragNote) return;
-                const now = Date.now(), dt = now - dragLastT;
-                if (dt > 0) {
-                    dragVX = (clientX - dragLastX) / dt * 16;
-                    dragVY = (clientY - dragLastY) / dt * 16;
-                }
-                dragLastX = clientX; dragLastY = clientY; dragLastT = now;
-
-                const dx = clientX - dragStartX, dy = clientY - dragStartY;
-                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragHasMoved = true;
-
-                let newLeft = Math.min(WALL_WIDTH - 30,  Math.max(-NOTE_W + 30, dragInitLeft + dx));
-                let newTop  = Math.min(WALL_HEIGHT - 30, Math.max(-NOTE_H + 30, dragInitTop  + dy));
-
-                // rAF 节流写 DOM：拖拽中禁用 transition，用 translate 即时移动
-                if (dragRafId) cancelAnimationFrame(dragRafId);
-                dragRafId = requestAnimationFrame(() => {
-                    if (dragNote) {
-                        dragNote.style.transition = 'none';
-                        dragNote.style.transform = `translate(${newLeft}px, ${newTop}px)`;
-                    }
-                });
-            }
-
-            function noteDragEnd() {
-                if (!dragNote) return;
-                cancelAnimationFrame(dragRafId);
-                const note = dragNote;
-                dragNote = null;
-                dragRafId = null;
-                if (!dragHasMoved) return;
-
-                // 读取当前 translate 位置
-                const m = note.style.transform.match(/translate\(([^,]+)px, ([^)]+)px\)/);
-                let curX = m ? parseFloat(m[1]) : 0;
-                let curY = m ? parseFloat(m[2]) : 0;
-
-                // 应用速度衰减
-                let finalX = Math.min(WALL_WIDTH-30, Math.max(-NOTE_W+30, curX + dragVX * 0.5));
-                let finalY = Math.min(WALL_HEIGHT-30, Math.max(-NOTE_H+30, curY + dragVY * 0.5));
-
-                // 写回 left/top，清除 translate，让 transition 接管
-                note.style.left = finalX + 'px';
-                note.style.top  = finalY + 'px';
-                note.style.transform = '';
-                note.style.transition = ''; // 恢复 CSS 默认 transition
-            }
-
-            // wall 层统一委托 mousedown / touchstart
-            function initNoteDrag() {
-                wall.addEventListener('mousedown', (e) => {
-                    const note = e.target.closest('.note');
-                    if (!note || e.button !== 0) return;
-                    if (e.target.closest('a')) return; // 超链接不拖
-                    e.preventDefault(); e.stopPropagation();
-                    noteDragStart(note, e.clientX, e.clientY);
-                    document.addEventListener('mousemove', onDocMouseMove);
-                    document.addEventListener('mouseup',  onDocMouseUp,  { once: true });
-                });
-                wall.addEventListener('touchstart', (e) => {
-                    if (e.touches.length !== 1) return;
-                    const note = e.target.closest('.note');
-                    if (!note) return;
-                    if (e.target.closest('a')) return;
-                    e.preventDefault(); e.stopPropagation();
-                    noteDragStart(note, e.touches[0].clientX, e.touches[0].clientY);
-                    document.addEventListener('touchmove', onDocTouchMove, { passive: false });
-                    document.addEventListener('touchend',  onDocTouchEnd,  { once: true });
-                    document.addEventListener('touchcancel', onDocTouchEnd, { once: true });
-                }, { passive: false });
-            }
-            function onDocMouseMove(e) { noteDragMove(e.clientX, e.clientY); }
-            function onDocMouseUp()    { noteDragEnd(); document.removeEventListener('mousemove', onDocMouseMove); }
-            function onDocTouchMove(e) { e.preventDefault(); if (e.touches.length===1) noteDragMove(e.touches[0].clientX, e.touches[0].clientY); }
-            function onDocTouchEnd()   { noteDragEnd(); document.removeEventListener('touchmove', onDocTouchMove); }
-            // makeDraggable 保留为空操作（createNote 仍会调用）
-            function makeDraggable(_el) { /* 已改为 wall 层事件委托，无需逐元素绑定 */ }
-
-            // 初始化便签（DocumentFragment 批量插入，只触发一次 reflow）
-            function initDefaultNotes(data = null) {
-                if (!data || !data.notes) return;
-                const frag = document.createDocumentFragment();
-                data.notes.forEach((item) => {
-                    frag.appendChild(createNote(
-                        item.text,
-                        null, null, null,
-                        item.style  || 'yellow',
-                        item.author || ''
-                    ));
-                });
-                wall.appendChild(frag);
-            }
-
-            // 设备检测
-            function isMobileDevice() {
-                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            }
-            
-            const mobileDevice = isMobileDevice();
-            
-            // 存储光标位置
-            let cursorPos = { x: 0, y: 0 };
-            
-            // 更新光标位置（throttle：每帧最多更新一次）
-            let cursorRafPending = false;
-            wrapper.addEventListener('mousemove', (e) => {
-                if (cursorRafPending) return;
-                cursorRafPending = true;
-                requestAnimationFrame(() => {
-                    cursorPos.x = e.clientX;
-                    cursorPos.y = e.clientY;
-                    cursorRafPending = false;
-                });
-            }, { passive: true });
-
-            // ========== 缩放逻辑 (纯 transform，GPU 加速) ==========
-            let wallTranslateX = 0, wallTranslateY = 0;  // 墙的平移量（px）
-
-            function updateZoom(newScale, useCursor = false) {
-                const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
-                if (vw === 0 || vh === 0) return;
-                const oldScale = currentScale;
-
-                // 确定缩放锚点
-                let focusX = vw / 2, focusY = vh / 2;
-                if (useCursor && !mobileDevice) {
-                    focusX = cursorPos.x;
-                    focusY = cursorPos.y;
-                }
-
-                // 缩放时保持锚点不动：
-                // 锚点在墙坐标系的位置 = (focusX - vw/2 - wallTranslateX) / oldScale
-                // 新平移量 = wallTranslateX - (锚点墙坐标) * (newScale - oldScale)
-                const anchorWallX = (focusX - vw/2 - wallTranslateX) / oldScale;
-                const anchorWallY = (focusY - vh/2 - wallTranslateY) / oldScale;
-                wallTranslateX -= anchorWallX * (newScale - oldScale);
-                wallTranslateY -= anchorWallY * (newScale - oldScale);
-
-                // 限制平移范围，确保墙不会完全移出视口
-                const scaledW = WALL_WIDTH * newScale, scaledH = WALL_HEIGHT * newScale;
-                const maxOffsetX = Math.max(0, (scaledW - vw) / 2);
-                const maxOffsetY = Math.max(0, (scaledH - vh) / 2);
-                wallTranslateX = Math.max(-maxOffsetX, Math.min(maxOffsetX, wallTranslateX));
-                wallTranslateY = Math.max(-maxOffsetY, Math.min(maxOffsetY, wallTranslateY));
-
-                applyWallTransform(newScale);
-                currentScale = newScale;
-                zoomSpan.innerText = Math.round(newScale * 100) + '%';
-            }
-
-            function applyWallTransform(scale) {
-                // translate(-50%, -50%) 居中 + translate(offset) 平移 + scale(s) 缩放
-                wall.style.transform = `translate(calc(-50% + ${wallTranslateX}px), calc(-50% + ${wallTranslateY}px)) scale(${scale})`;
-            }
-
-            // 滑块事件
-            slider.addEventListener('input', (e) => {
-                const newScale = parseFloat(e.target.value);
-                updateZoom(newScale, !mobileDevice); // 根据设备类型决定是否使用光标跟随缩放
-            });
-
-            // 重置到墙面中心
-            function scrollToCenter() {
-                wallTranslateX = 0;
-                wallTranslateY = 0;
-                slider.value = currentScale;
-                zoomSpan.innerText = Math.round(currentScale * 100) + '%';
-                applyWallTransform(currentScale);
-            }
-
-            // 初始化：加载便签 → 渲染 → 滚动定位
-            window.addEventListener('DOMContentLoaded', () => {
-                // 手势和委托立即绑定，不等 fetch
-                makeWallDraggable();
-                initNoteDrag();
-                // 先定位，避免加载数据时页面空白
-                scrollToCenter();
-            });
-
-            window.addEventListener('load', async () => {
-                const loading = document.getElementById('loadingHint');
-                if (loading) loading.style.display = 'block';
-                try {
-                    const response = await fetch(`notes-data.json?t=${Date.now()}`);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    const data = await response.json();
-                    initDefaultNotes(data);
-                } catch (error) {
-                    console.warn('无法加载便签数据:', error.message);
-                } finally {
-                    if (loading) {
-                        setTimeout(() => loading.style.display = 'none', 300);
-                    }
-                }
-            });
-
-            // ── 墙面手势管理器：统一处理单指拖动 + 双指缩放 ──
-            function makeWallDraggable() {
-
-                // ── 鼠标拖动（桌面端）──
-                let mouseDown = false;
-                let mouseStartX, mouseStartY, mouseInitTX, mouseInitTY;
-
-                function onMouseDown(e) {
-                    if (e.target === wall || e.target === wrapper) {
-                        if (e.button !== 0) return;
-                        e.preventDefault();
-                        mouseDown = true;
-                        mouseStartX = e.clientX;
-                        mouseStartY = e.clientY;
-                        mouseInitTX = wallTranslateX;
-                        mouseInitTY = wallTranslateY;
-                        document.addEventListener('mousemove', onMouseMove);
-                        document.addEventListener('mouseup', onMouseUp);
-                    }
-                }
-                function onMouseMove(e) {
-                    if (!mouseDown) return;
-                    const dx = e.clientX - mouseStartX;
-                    const dy = e.clientY - mouseStartY;
-                    wallTranslateX = mouseInitTX + dx;
-                    wallTranslateY = mouseInitTY + dy;
-                    // 限制范围
-                    const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
-                    const scaledW = WALL_WIDTH * currentScale, scaledH = WALL_HEIGHT * currentScale;
-                    const maxX = Math.max(0, (scaledW - vw) / 2);
-                    const maxY = Math.max(0, (scaledH - vh) / 2);
-                    wallTranslateX = Math.max(-maxX, Math.min(maxX, wallTranslateX));
-                    wallTranslateY = Math.max(-maxY, Math.min(maxY, wallTranslateY));
-                    applyWallTransform(currentScale);
-                }
-                function onMouseUp() {
-                    mouseDown = false;
-                    document.removeEventListener('mousemove', onMouseMove);
-                    document.removeEventListener('mouseup', onMouseUp);
-                }
-                wall.addEventListener('mousedown', onMouseDown);
-                wrapper.addEventListener('mousedown', onMouseDown);
-
-                // ── 触摸手势（移动端）：单指拖动 + 双指 pinch 缩放 ──
-                let touchState = 'idle';
-                let dragStartX, dragStartY, dragInitTX, dragInitTY;
-                let pinchInitDist, pinchInitScale, pinchInitMidX, pinchInitMidY;
-                let pinchInitTX, pinchInitTY;
-
-                function getTouchMidpoint(touches) {
-                    return {
-                        x: (touches[0].clientX + touches[1].clientX) / 2,
-                        y: (touches[0].clientY + touches[1].clientY) / 2,
-                    };
-                }
-                function getTouchDist(touches) {
-                    const dx = touches[1].clientX - touches[0].clientX;
-                    const dy = touches[1].clientY - touches[0].clientY;
-                    return Math.sqrt(dx * dx + dy * dy);
-                }
-
-                function onTouchStart(e) {
-                    // 如果触摸起点在 zoom-control 内，忽略（让滑块自己处理）
-                    if (e.target.closest && e.target.closest('.zoom-control')) return;
-
-                    if (e.touches.length === 1) {
-                        if (e.target === wall || e.target === wrapper) {
-                            e.preventDefault();
-                            touchState = 'drag';
-                            dragStartX = e.touches[0].clientX;
-                            dragStartY = e.touches[0].clientY;
-                            dragInitTX = wallTranslateX;
-                            dragInitTY = wallTranslateY;
-                        }
-                    } else if (e.touches.length === 2) {
-                        e.preventDefault();
-                        touchState = 'pinch';
-                        pinchInitDist  = getTouchDist(e.touches);
-                        pinchInitScale = currentScale;
-                        const mid = getTouchMidpoint(e.touches);
-                        pinchInitMidX = mid.x;
-                        pinchInitMidY = mid.y;
-                        pinchInitTX = wallTranslateX;
-                        pinchInitTY = wallTranslateY;
-                    }
-                }
-
-                function onTouchMove(e) {
-                    if (touchState === 'idle') return;
-                    e.preventDefault();
-
-                    if (touchState === 'drag' && e.touches.length === 1) {
-                        const dx = e.touches[0].clientX - dragStartX;
-                        const dy = e.touches[0].clientY - dragStartY;
-                        wallTranslateX = dragInitTX + dx;
-                        wallTranslateY = dragInitTY + dy;
-                        const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
-                        const scaledW = WALL_WIDTH * currentScale, scaledH = WALL_HEIGHT * currentScale;
-                        const maxX = Math.max(0, (scaledW - vw) / 2);
-                        const maxY = Math.max(0, (scaledH - vh) / 2);
-                        wallTranslateX = Math.max(-maxX, Math.min(maxX, wallTranslateX));
-                        wallTranslateY = Math.max(-maxY, Math.min(maxY, wallTranslateY));
-                        applyWallTransform(currentScale);
-
-                    } else if (e.touches.length === 2) {
-                        // 如果中途变为双指，升级为 pinch
-                        if (touchState !== 'pinch') {
-                            touchState = 'pinch';
-                            pinchInitDist  = getTouchDist(e.touches);
-                            pinchInitScale = currentScale;
-                            const mid = getTouchMidpoint(e.touches);
-                            pinchInitMidX = mid.x;
-                            pinchInitMidY = mid.y;
-                            pinchInitTX = wallTranslateX;
-                            pinchInitTY = wallTranslateY;
-                            return;
-                        }
-
-                        const dist = getTouchDist(e.touches);
-                        let newScale = pinchInitScale * (dist / pinchInitDist);
-                        newScale = Math.max(0.2, Math.min(3, newScale));
-
-                        // 以双指中点为锚点缩放
-                        const mid = getTouchMidpoint(e.touches);
-                        const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
-                        // 锚点在墙坐标系的位置（相对初始时）
-                        const anchorWallX = (pinchInitMidX - vw/2 - pinchInitTX) / pinchInitScale;
-                        const anchorWallY = (pinchInitMidY - vh/2 - pinchInitTY) / pinchInitScale;
-                        // 新平移 = 初始平移 + 锚点偏移 + 中点移动
-                        wallTranslateX = pinchInitTX - anchorWallX * (newScale - pinchInitScale) + (mid.x - pinchInitMidX);
-                        wallTranslateY = pinchInitTY - anchorWallY * (newScale - pinchInitScale) + (mid.y - pinchInitMidY);
-
-                        // 限制范围
-                        const scaledW = WALL_WIDTH * newScale, scaledH = WALL_HEIGHT * newScale;
-                        const maxX = Math.max(0, (scaledW - vw) / 2);
-                        const maxY = Math.max(0, (scaledH - vh) / 2);
-                        wallTranslateX = Math.max(-maxX, Math.min(maxX, wallTranslateX));
-                        wallTranslateY = Math.max(-maxY, Math.min(maxY, wallTranslateY));
-
-                        applyWallTransform(newScale);
-                        currentScale = newScale;
-                        slider.value = newScale;
-                        zoomSpan.innerText = Math.round(newScale * 100) + '%';
-                    }
-                }
-
-                function onTouchEnd(e) {
-                    if (e.touches.length === 0) {
-                        touchState = 'idle';
-                    } else if (e.touches.length === 1 && touchState === 'pinch') {
-                        touchState = 'drag';
-                        dragStartX = e.touches[0].clientX;
-                        dragStartY = e.touches[0].clientY;
-                        dragInitTX = wallTranslateX;
-                        dragInitTY = wallTranslateY;
-                    }
-                }
-
-                wrapper.addEventListener('touchstart', onTouchStart, { passive: false });
-                wall.addEventListener('touchstart',    onTouchStart, { passive: false });
-                // move/end 挂在 document，避免手指划出 wrapper 时丢失事件
-                document.addEventListener('touchmove', onTouchMove, { passive: false });
-                document.addEventListener('touchend',  onTouchEnd,  { passive: true });
-                document.addEventListener('touchcancel', onTouchEnd, { passive: true });
-            }
-
-            // zoom-control 阻止触摸事件冒泡到 wrapper（防止滑块操作触发墙面拖动）
-            document.querySelector('.zoom-control').addEventListener('touchstart', (e) => {
-                e.stopPropagation();
-            }, { passive: true });
-            document.querySelector('.zoom-control').addEventListener('touchmove', (e) => {
-                e.stopPropagation();
-            }, { passive: true });
-
-            // 弹窗控制
-            const modal = document.getElementById('infoModal');
-            const closeBtn = document.getElementById('closeModalBtn');
-            closeBtn.addEventListener('click', () => {
-                modal.classList.add('hidden');
-            });
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.classList.add('hidden');
-                }
-            });
-
-            // 鼠标滚轮缩放（passive:false 允许 preventDefault，rAF 节流避免连续帧堆积）
-            let wheelRafId = null;
-            wrapper.addEventListener('wheel', (e) => {
-                e.preventDefault();
-                cursorPos.x = e.clientX;
-                cursorPos.y = e.clientY;
-                const delta = e.deltaY > 0 ? -0.05 : 0.05;
-                let newScale = Math.max(0.2, Math.min(3, currentScale + delta));
-                slider.value = newScale;
-                if (wheelRafId) return; // 上一帧还没处理完，跳过
-                wheelRafId = requestAnimationFrame(() => {
-                    updateZoom(newScale, !mobileDevice);
-                    wheelRafId = null;
-                });
-            }, { passive: false });
-
-            // 双指缩放已整合至 makeWallDraggable() 的统一手势管理器
-
-            // 窗口resize时，可能需要调整滚动边界 (保持中心点？为了简化，不做额外处理，但可保持缩放不变)
-            // 可选：resize 时重新限制滚动边界，但无需更改缩放。
-            window.addEventListener('resize', () => {
-                // 窗口大小变化时，限制墙的平移范围
-                const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
-                const scaledW = WALL_WIDTH * currentScale, scaledH = WALL_HEIGHT * currentScale;
-                const maxX = Math.max(0, (scaledW - vw) / 2);
-                const maxY = Math.max(0, (scaledH - vh) / 2);
-                wallTranslateX = Math.max(-maxX, Math.min(maxX, wallTranslateX));
-                wallTranslateY = Math.max(-maxY, Math.min(maxY, wallTranslateY));
-                applyWallTransform(currentScale);
-            });
-        })();
-    </script>
-
-    <!-- 加载提示 -->
-    <div id="loadingHint" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); 
-         background:rgba(45,36,30,0.95); color:#f7d9a0; padding:20px 32px; border-radius:16px;
-         font-family:'Segoe UI',sans-serif; font-size:1rem; z-index:30000; pointer-events:none;
-         box-shadow:0 8px 32px rgba(0,0,0,0.6); display:none;">
-        <div style="text-align:center;">
-            <div style="font-size:2rem; margin-bottom:8px;">🧱</div>
-            <div>加载便签中...</div>
-        </div>
-    </div>
+
+<div class="wall-wrapper">
+  <div class="wall" id="wall"></div>
+</div>
+
+<div class="zoom-control">
+  <input type="range" id="zoomSlider" min="0.1" max="2" step="0.05" value="1" />
+</div>
+
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <h2>欢迎使用便签墙</h2>
+    <p>你可以拖动便签、缩放墙面。数据自动保存到本地。</p>
+    <button class="close-btn">我知道了</button>
+  </div>
+</div>
+
+<script>
+  // ======================
+  // 工具函数
+  // ======================
+  function clamp(val, min, max) {
+    return Math.min(Math.max(val, min), max);
+  }
+
+  // ======================
+  // 墙体拖拽与缩放
+  // ======================
+  const wall = document.getElementById('wall');
+  const zoomSlider = document.getElementById('zoomSlider');
+  const wallWrapper = document.querySelector('.wall-wrapper');
+
+  let wallX = 0, wallY = 0, scale = 1;
+  let isDraggingWall = false;
+  let lastX, lastY;
+
+  function updateWallTransform() {
+    wall.style.transform = `translate(-50%, -50%) translate(${wallX}px, ${wallY}px) scale(${scale}) translateZ(0)`;
+  }
+
+  // 墙体拖拽
+  wallWrapper.addEventListener('mousedown', startDrag);
+  wallWrapper.addEventListener('touchstart', e => {
+    if (e.touches.length === 1) startDrag(e.touches);
+  }, { passive: false });
+
+  function startDrag(e) {
+    const target = e.target;
+    // 防止在滑块或弹窗上触发墙体拖拽
+    if (target.closest('.zoom-control') || target.closest('.modal')) return;
+
+    isDraggingWall = true;
+    lastX = ('clientX' in e) ? e.clientX : e.pageX;
+    lastY = ('clientY' in e) ? e.clientY : e.pageY;
+    wallWrapper.style.cursor = 'grabbing';
+    e.preventDefault();
+  }
+
+  window.addEventListener('mousemove', drag);
+  window.addEventListener('touchmove', e => {
+    if (isDraggingWall && e.touches.length === 1) {
+      drag(e.touches);
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  function drag(e) {
+    if (!isDraggingWall) return;
+    const dx = (('clientX' in e) ? e.clientX : e.pageX) - lastX;
+    const dy = (('clientY' in e) ? e.clientY : e.pageY) - lastY;
+    wallX += dx;
+    wallY += dy;
+    lastX += dx;
+    lastY += dy;
+    updateWallTransform();
+  }
+
+  window.addEventListener('mouseup', endDrag);
+  window.addEventListener('touchend', endDrag);
+
+  function endDrag() {
+    isDraggingWall = false;
+    wallWrapper.style.cursor = 'default';
+  }
+
+  // 缩放控制
+  zoomSlider.addEventListener('input', () => {
+    scale = clamp(parseFloat(zoomSlider.value), 0.1, 2);
+    updateWallTransform();
+  });
+
+  // ======================
+  // 便签管理
+  // ======================
+  let notes = [];
+  let noteIdCounter = 0;
+
+  function createNote(data = {}) {
+    const note = document.createElement('div');
+    note.className = 'note';
+    note.draggable = false; // 禁用原生拖拽
+    note.contentEditable = true;
+    note.textContent = data.text || '点击编辑...';
+
+    const x = data.x ?? Math.random() * 1000 - 200;
+    const y = data.y ?? Math.random() * 600 - 100;
+    note.style.left = x + 'px';
+    note.style.top = y + 'px';
+
+    const id = data.id ?? ++noteIdCounter;
+    note.dataset.id = id;
+
+    // 便签拖拽
+    let isDraggingNote = false;
+    let offsetX, offsetY;
+
+    note.addEventListener('mousedown', e => {
+      if (e.target !== note) return; // 只在便签空白处拖拽
+      isDraggingNote = true;
+      const rect = note.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+      note.style.zIndex = '1000';
+      e.stopPropagation();
+    });
+
+    note.addEventListener('touchstart', e => {
+      if (e.target !== note || e.touches.length > 1) return;
+      isDraggingNote = true;
+      const rect = note.getBoundingClientRect();
+      offsetX = e.touches.clientX - rect.left;
+      offsetY = e.touches.clientY - rect.top;
+      note.style.zIndex = '1000';
+      e.stopPropagation();
+    }, { passive: false });
+
+    function moveNote(clientX, clientY) {
+      if (!isDraggingNote) return;
+      const wallRect = wall.getBoundingClientRect();
+      const scaleX = scale;
+      const scaleY = scale;
+      const relX = (clientX - wallRect.left - wallX) / scaleX;
+      const relY = (clientY - wallRect.top - wallY) / scaleY;
+      note.style.left = (relX - offsetX) + 'px';
+      note.style.top = (relY - offsetY) + 'px';
+    }
+
+    window.addEventListener('mousemove', e => moveNote(e.clientX, e.clientY));
+    window.addEventListener('touchmove', e => {
+      if (isDraggingNote && e.touches.length === 1) {
+        moveNote(e.touches.clientX, e.touches.clientY);
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    window.addEventListener('mouseup', () => isDraggingNote = false);
+    window.addEventListener('touchend', () => isDraggingNote = false);
+
+    // 内容变更保存
+    note.addEventListener('input', saveNotesDebounced);
+
+    wall.appendChild(note);
+    notes.push({ id, element: note });
+  }
+
+  // ======================
+  // 数据持久化
+  // ======================
+  function saveNotes() {
+    const data = notes.map(n => {
+      const el = n.element;
+      return {
+        id: n.id,
+        text: el.textContent,
+        x: parseFloat(el.style.left),
+        y: parseFloat(el.style.top)
+      };
+    });
+    localStorage.setItem('sticky-notes-data', JSON.stringify(data));
+  }
+
+  let saveTimer;
+  function saveNotesDebounced() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveNotes, 500);
+  }
+
+  function loadNotes() {
+    try {
+      const saved = localStorage.getItem('sticky-notes-data');
+      if (saved) {
+        const data = JSON.parse(saved);
+        data.forEach(createNote);
+        noteIdCounter = Math.max(...data.map(d => d.id), 0);
+      } else {
+        // 初始便签
+        createNote({ text: '欢迎使用！\n拖拽我试试~', x: 0, y: 0 });
+      }
+    } catch (e) {
+      console.error('加载便签失败', e);
+      createNote({ text: '初始化便签', x: 0, y: 0 });
+    }
+  }
+
+  // ======================
+  // 初始化
+  // ======================
+  window.addEventListener('DOMContentLoaded', () => {
+    loadNotes();
+
+    // 延迟显示弹窗，避免阻塞
+    setTimeout(() => {
+      const modal = document.getElementById('infoModal');
+      modal.classList.add('show');
+      modal.querySelector('.close-btn').addEventListener('click', () => {
+        modal.classList.remove('show');
+      });
+    }, 300);
+  });
+</script>
+
 </body>
 </html>
