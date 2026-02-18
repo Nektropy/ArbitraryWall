@@ -1,198 +1,873 @@
 {
   "notes": [
     {
-      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
-      "style": "red",
-      "author": "美食家"
+      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
+      "style": "indigo",
+      "author": "大熊"
     },
     {
-      "text": "🤔 **思考**\n如何平衡工作和生活？",
-      "style": "red",
-      "author": "跑步达人"
-    },
-    {
-      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
-      "style": "pink",
-      "author": ""
-    },
-    {
-      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "text": "😌 **放松**\n周末终于可以好好休息了",
       "style": "amber",
-      "author": "晓雪"
-    },
-    {
-      "text": "💡 **灵感记录**\n可以做一个便签墙应用\n用户可以自由贴便签",
-      "style": "pink",
-      "author": "流浪的鱼"
-    },
-    {
-      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
-      "style": "teal",
       "author": "音乐人"
     },
     {
-      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
-      "style": "yellow",
-      "author": "向日葵"
-    },
-    {
-      "text": "📌 **重要提醒**\n周五下午开会\n记得准备 PPT",
-      "style": "red",
-      "author": "美食家"
-    },
-    {
-      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
-      "style": "pink",
-      "author": "星空"
-    },
-    {
-      "text": "**项目进度更新**\n- 完成需求分析\n- 开始原型设计\n预计下周完成 ✅",
-      "style": "lime",
-      "author": "读书人"
-    },
-    {
-      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
-      "style": "red",
-      "author": "读书人"
-    },
-    {
-      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
+      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
       "style": "green",
+      "author": "码农一枚"
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "pink",
+      "author": "静心"
+    },
+    {
+      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
+      "style": "orange",
       "author": ""
     },
     {
       "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
-      "style": "pink",
-      "author": "小明"
+      "style": "lime",
+      "author": "大熊"
     },
     {
-      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "text": "📖 **读书笔记**\n> 知识改变命运\n今天读完《人类简史》",
+      "style": "red",
+      "author": "阿强"
+    },
+    {
+      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
+      "style": "amber",
+      "author": "晓雪"
+    },
+    {
+      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
+      "style": "green",
+      "author": "码农一枚"
+    },
+    {
+      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
       "style": "pink",
       "author": "阿强"
     },
     {
-      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
-      "style": "lime",
-      "author": "小明"
-    },
-    {
-      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
-      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
-      "author": "静心"
-    },
-    {
-      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
-      "style": "lime",
-      "author": "静心"
-    },
-    {
-      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
-      "style": "amber",
-      "author": "向日葵"
-    },
-    {
-      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
-      "style": "purple",
-      "author": "晓雪"
-    },
-    {
-      "text": "🙏 **祝福**\n希望大家都能实现梦想",
-      "style": "orange",
-      "author": "静心"
-    },
-    {
-      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
-      "style": "lime",
-      "author": "流浪的鱼"
-    },
-    {
-      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
-      "style": "red",
-      "author": "音乐人"
-    },
-    {
-      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
-      "style": "cyan",
-      "author": "摄影师"
-    },
-    {
-      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
-      "style": "cyan",
-      "author": "晓雪"
-    },
-    {
-      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
-      "style": "red",
-      "author": "小猫"
-    },
-    {
-      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
-      "style": "orange",
+      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
+      "style": "indigo",
       "author": ""
     },
     {
-      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
-      "style": "yellow",
-      "author": "小明"
-    },
-    {
-      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
       "style": "red",
-      "author": "追风少年"
-    },
-    {
-      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
-      "style": "amber",
-      "author": "小明"
-    },
-    {
-      "text": "😌 **放松**\n周末终于可以好好休息了",
-      "style": "cyan",
-      "author": ""
-    },
-    {
-      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
-      "style": "cyan",
       "author": "星空"
     },
     {
-      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
       "style": "indigo",
-      "author": "音乐人"
+      "author": ""
     },
     {
-      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
-      "style": "yellow",
-      "author": "小猫"
+      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
+      "style": "lime",
+      "author": "追风少年"
     },
     {
-      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
-      "style": "blue",
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "cyan",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
+      "style": "cyan",
+      "author": "小明"
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "indigo",
       "author": "静心"
-    },
-    {
-      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
-      "style": "orange",
-      "author": "小猫"
-    },
-    {
-      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
-      "style": "pink",
-      "author": "晓雪"
     },
     {
       "text": "**Markdown 测试**\n*斜体* **粗体** ~~删除~~\n- 列表项 1\n- 列表项 2",
       "style": "orange",
-      "author": "大熊"
+      "author": ""
     },
     {
-      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
+      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
+      "style": "blue",
+      "author": "跑步达人"
+    },
+    {
+      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
+      "style": "yellow",
+      "author": "星空"
+    },
+    {
+      "text": "📖 **读书笔记**\n> 知识改变命运\n今天读完《人类简史》",
+      "style": "red",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "green",
+      "author": "跑步达人"
+    },
+    {
+      "text": "**项目进度更新**\n- 完成需求分析\n- 开始原型设计\n预计下周完成 ✅",
+      "style": "lime",
+      "author": "码农一枚"
+    },
+    {
+      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
+      "style": "cyan",
+      "author": "晓雪"
+    },
+    {
+      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
+      "style": "green",
+      "author": "丽丽"
+    },
+    {
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "red",
+      "author": "追风少年"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "lime",
+      "author": "追风少年"
+    },
+    {
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "blue",
+      "author": ""
+    },
+    {
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "blue",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
+      "style": "teal",
+      "author": "向日葵"
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "blue",
+      "author": "摄影师"
+    },
+    {
+      "text": "🤔 **思考**\n如何平衡工作和生活？",
+      "style": "orange",
+      "author": "丽丽"
+    },
+    {
+      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
+      "style": "pink",
+      "author": "跑步达人"
+    },
+    {
+      "text": "🤔 **思考**\n如何平衡工作和生活？",
+      "style": "indigo",
+      "author": "读书人"
+    },
+    {
+      "text": "**熵的网站**\n[点击访问](https://www.nekt.qzz.io)\n欢迎来玩 🎉",
+      "style": "orange",
+      "author": "美食家"
+    },
+    {
+      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
+      "style": "lime",
+      "author": "丽丽"
+    },
+    {
+      "text": "📖 **读书笔记**\n> 知识改变命运\n今天读完《人类简史》",
+      "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
+      "author": ""
+    },
+    {
+      "text": "> 纸上得来终觉浅\n> 绝知此事要躬行\n——陆游",
+      "style": "indigo",
+      "author": "追风少年"
+    },
+    {
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "lime",
+      "author": ""
+    },
+    {
+      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
+      "style": "teal",
+      "author": "码农一枚"
+    },
+    {
+      "text": "**熵的网站**\n[点击访问](https://www.nekt.qzz.io)\n欢迎来玩 🎉",
+      "style": "lime",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "pink",
+      "author": "星空"
+    },
+    {
+      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
+      "style": "orange",
+      "author": "读书人"
+    },
+    {
+      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
+      "style": "cyan",
+      "author": ""
+    },
+    {
+      "text": "📌 **重要提醒**\n周五下午开会\n记得准备 PPT",
+      "style": "yellow",
+      "author": "追风少年"
+    },
+    {
+      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
+      "style": "amber",
+      "author": ""
+    },
+    {
+      "text": "🤔 **思考**\n如何平衡工作和生活？",
+      "style": "pink",
+      "author": ""
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
       "style": "indigo",
       "author": ""
     },
     {
-      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "blue",
+      "author": ""
+    },
+    {
+      "text": "💡 **灵感记录**\n可以做一个便签墙应用\n用户可以自由贴便签",
+      "style": "teal",
+      "author": "追风少年"
+    },
+    {
+      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
+      "style": "cyan",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
+      "style": "amber",
+      "author": "阿强"
+    },
+    {
+      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
+      "style": "purple",
+      "author": "美食家"
+    },
+    {
+      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
+      "style": "red",
+      "author": "摄影师"
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "red",
+      "author": "美食家"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "red",
+      "author": "静心"
+    },
+    {
+      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
+      "style": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=300",
+      "author": "小猫"
+    },
+    {
+      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
+      "style": "yellow",
+      "author": ""
+    },
+    {
+      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
       "style": "orange",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "lime",
+      "author": "跑步达人"
+    },
+    {
+      "text": "💡 **灵感记录**\n可以做一个便签墙应用\n用户可以自由贴便签",
+      "style": "pink",
+      "author": ""
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "green",
+      "author": "晓雪"
+    },
+    {
+      "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
+      "style": "amber",
+      "author": "美食家"
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "yellow",
+      "author": "码农一枚"
+    },
+    {
+      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
+      "style": "orange",
+      "author": "美食家"
+    },
+    {
+      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
+      "style": "green",
+      "author": "向日葵"
+    },
+    {
+      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "style": "yellow",
+      "author": ""
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "blue",
+      "author": "向日葵"
+    },
+    {
+      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
+      "style": "green",
+      "author": "码农一枚"
+    },
+    {
+      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
+      "style": "indigo",
+      "author": "晓雪"
+    },
+    {
+      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
+      "style": "teal",
+      "author": "码农一枚"
+    },
+    {
+      "text": "🤔 **思考**\n如何平衡工作和生活？",
+      "style": "lime",
+      "author": "音乐人"
+    },
+    {
+      "text": "**项目进度更新**\n- 完成需求分析\n- 开始原型设计\n预计下周完成 ✅",
+      "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "orange",
+      "author": ""
+    },
+    {
+      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
+      "style": "yellow",
+      "author": "丽丽"
+    },
+    {
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "pink",
+      "author": "摄影师"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "pink",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "teal",
+      "author": "摄影师"
+    },
+    {
+      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
+      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
+      "author": "向日葵"
+    },
+    {
+      "text": "> 纸上得来终觉浅\n> 绝知此事要躬行\n——陆游",
+      "style": "blue",
+      "author": "晓雪"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "purple",
+      "author": "音乐人"
+    },
+    {
+      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
+      "style": "lime",
+      "author": "丽丽"
+    },
+    {
+      "text": "# 🎯 目标\n## 短期\n学会 React\n## 长期\n成为全栈工程师",
+      "style": "purple",
+      "author": "小明"
+    },
+    {
+      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
+      "style": "red",
+      "author": "丽丽"
+    },
+    {
+      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
+      "style": "lime",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
+      "style": "pink",
+      "author": "晓雪"
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "cyan",
+      "author": "向日葵"
+    },
+    {
+      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
+      "style": "red",
+      "author": "向日葵"
+    },
+    {
+      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
+      "style": "cyan",
+      "author": "大熊"
+    },
+    {
+      "text": "**熵的网站**\n[点击访问](https://www.nekt.qzz.io)\n欢迎来玩 🎉",
+      "style": "orange",
+      "author": "摄影师"
+    },
+    {
+      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
+      "style": "purple",
+      "author": "跑步达人"
+    },
+    {
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "orange",
+      "author": "小猫"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "pink",
+      "author": "读书人"
+    },
+    {
+      "text": "🤔 **思考**\n如何平衡工作和生活？",
+      "style": "red",
+      "author": ""
+    },
+    {
+      "text": "> 纸上得来终觉浅\n> 绝知此事要躬行\n——陆游",
+      "style": "amber",
+      "author": "大熊"
+    },
+    {
+      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
+      "style": "teal",
+      "author": "阿强"
+    },
+    {
+      "text": "```python\ndef hello():\n    print('Hello World!')\n```\n代码便签测试",
+      "style": "purple",
+      "author": "旅行者"
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "yellow",
+      "author": "摄影师"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "red",
+      "author": "星空"
+    },
+    {
+      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
+      "style": "teal",
+      "author": "阿强"
+    },
+    {
+      "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
+      "style": "yellow",
+      "author": "美食家"
+    },
+    {
+      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
+      "style": "amber",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
+      "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
+      "author": "丽丽"
+    },
+    {
+      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
+      "style": "indigo",
+      "author": "晓雪"
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "amber",
+      "author": ""
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "green",
+      "author": "码农一枚"
+    },
+    {
+      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
+      "style": "red",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "teal",
+      "author": "向日葵"
+    },
+    {
+      "text": "**项目进度更新**\n- 完成需求分析\n- 开始原型设计\n预计下周完成 ✅",
+      "style": "teal",
+      "author": "美食家"
+    },
+    {
+      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
+      "style": "green",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "purple",
+      "author": "丽丽"
+    },
+    {
+      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
+      "style": "pink",
+      "author": "星空"
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "lime",
+      "author": "小猫"
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "lime",
+      "author": "小猫"
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "teal",
+      "author": "阿强"
+    },
+    {
+      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
+      "style": "teal",
+      "author": "小明"
+    },
+    {
+      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
+      "style": "blue",
+      "author": "星空"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "cyan",
+      "author": "旅行者"
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "green",
+      "author": "音乐人"
+    },
+    {
+      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
+      "style": "pink",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "pink",
+      "author": "星空"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "blue",
+      "author": "星空"
+    },
+    {
+      "text": "📖 **读书笔记**\n> 知识改变命运\n今天读完《人类简史》",
+      "style": "green",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
+      "style": "amber",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "pink",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
+      "style": "indigo",
+      "author": "读书人"
+    },
+    {
+      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
+      "style": "lime",
+      "author": "码农一枚"
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "purple",
+      "author": ""
+    },
+    {
+      "text": "📌 **重要提醒**\n周五下午开会\n记得准备 PPT",
+      "style": "green",
+      "author": ""
+    },
+    {
+      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
+      "style": "blue",
+      "author": "追风少年"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "pink",
+      "author": "跑步达人"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "indigo",
+      "author": "摄影师"
+    },
+    {
+      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
+      "style": "orange",
+      "author": "丽丽"
+    },
+    {
+      "text": "🤔 **思考**\n如何平衡工作和生活？",
+      "style": "lime",
+      "author": "旅行者"
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "teal",
+      "author": "星空"
+    },
+    {
+      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
+      "style": "cyan",
+      "author": ""
+    },
+    {
+      "text": "🤔 **思考**\n如何平衡工作和生活？",
+      "style": "pink",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "orange",
+      "author": "摄影师"
+    },
+    {
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "cyan",
+      "author": "静心"
+    },
+    {
+      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "style": "pink",
+      "author": "静心"
+    },
+    {
+      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
+      "style": "teal",
+      "author": ""
+    },
+    {
+      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "style": "amber",
+      "author": "阿强"
+    },
+    {
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "purple",
+      "author": "跑步达人"
+    },
+    {
+      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
+      "style": "pink",
+      "author": "跑步达人"
+    },
+    {
+      "text": "📖 **读书笔记**\n> 知识改变命运\n今天读完《人类简史》",
+      "style": "lime",
+      "author": "大熊"
+    },
+    {
+      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
+      "style": "indigo",
+      "author": "旅行者"
+    },
+    {
+      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
+      "style": "lime",
+      "author": "跑步达人"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "yellow",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "📖 **读书笔记**\n> 知识改变命运\n今天读完《人类简史》",
+      "style": "yellow",
+      "author": "晓雪"
+    },
+    {
+      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "style": "indigo",
+      "author": ""
+    },
+    {
+      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
+      "style": "pink",
+      "author": "摄影师"
+    },
+    {
+      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
+      "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
+      "author": "大熊"
+    },
+    {
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "cyan",
+      "author": "星空"
+    },
+    {
+      "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
+      "style": "orange",
+      "author": "读书人"
+    },
+    {
+      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
+      "style": "pink",
+      "author": "大熊"
+    },
+    {
+      "text": "📌 **重要提醒**\n周五下午开会\n记得准备 PPT",
+      "style": "purple",
+      "author": "跑步达人"
+    },
+    {
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "indigo",
+      "author": "小猫"
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "teal",
+      "author": "追风少年"
+    },
+    {
+      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
+      "style": "teal",
+      "author": "晓雪"
+    },
+    {
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "purple",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
+      "style": "cyan",
+      "author": ""
+    },
+    {
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "lime",
+      "author": ""
+    },
+    {
+      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
+      "style": "purple",
+      "author": "星空"
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "amber",
+      "author": "读书人"
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "orange",
+      "author": "大熊"
+    },
+    {
+      "text": "# 🎯 目标\n## 短期\n学会 React\n## 长期\n成为全栈工程师",
+      "style": "green",
+      "author": ""
+    },
+    {
+      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
+      "style": "lime",
+      "author": "读书人"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "teal",
+      "author": "码农一枚"
+    },
+    {
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "teal",
+      "author": ""
+    },
+    {
+      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
+      "style": "green",
+      "author": "星空"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "blue",
+      "author": ""
+    },
+    {
+      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "style": "yellow",
+      "author": "旅行者"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "orange",
+      "author": ""
+    },
+    {
+      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
+      "style": "lime",
       "author": "晓雪"
     },
     {
@@ -201,808 +876,1633 @@
       "author": ""
     },
     {
-      "text": "🤔 **思考**\n如何平衡工作和生活？",
-      "style": "blue",
-      "author": "设计师Leo"
-    },
-    {
       "text": "📖 **读书笔记**\n> 知识改变命运\n今天读完《人类简史》",
-      "style": "indigo",
-      "author": "美食家"
+      "style": "yellow",
+      "author": "星空"
     },
     {
-      "text": "```python\ndef hello():\n    print('Hello World!')\n```\n代码便签测试",
-      "style": "green",
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "amber",
+      "author": ""
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "amber",
       "author": "旅行者"
     },
     {
-      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
-      "style": "blue",
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "purple",
+      "author": ""
+    },
+    {
+      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
+      "style": "orange",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
+      "style": "lime",
+      "author": ""
+    },
+    {
+      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
+      "style": "yellow",
       "author": "音乐人"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "indigo",
+      "author": "追风少年"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "orange",
+      "author": "星空"
+    },
+    {
+      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "style": "amber",
+      "author": ""
+    },
+    {
+      "text": "💡 **灵感记录**\n可以做一个便签墙应用\n用户可以自由贴便签",
+      "style": "green",
+      "author": "小猫"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "pink",
+      "author": ""
+    },
+    {
+      "text": "📌 **重要提醒**\n周五下午开会\n记得准备 PPT",
+      "style": "lime",
+      "author": "静心"
+    },
+    {
+      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
+      "style": "red",
+      "author": "美食家"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "blue",
+      "author": ""
+    },
+    {
+      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "style": "red",
+      "author": "跑步达人"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "teal",
+      "author": "阿强"
+    },
+    {
+      "text": "```python\ndef hello():\n    print('Hello World!')\n```\n代码便签测试",
+      "style": "pink",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=300",
+      "author": ""
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "orange",
+      "author": ""
+    },
+    {
+      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
+      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
+      "style": "orange",
+      "author": "晓雪"
+    },
+    {
+      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
+      "style": "pink",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "orange",
+      "author": "追风少年"
+    },
+    {
+      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
+      "style": "indigo",
+      "author": ""
     },
     {
       "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
       "style": "indigo",
-      "author": "美食家"
-    },
-    {
-      "text": "😌 **放松**\n周末终于可以好好休息了",
-      "style": "lime",
-      "author": ""
-    },
-    {
-      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
-      "style": "indigo",
-      "author": "小猫"
-    },
-    {
-      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
-      "style": "amber",
-      "author": "读书人"
-    },
-    {
-      "text": "😌 **放松**\n周末终于可以好好休息了",
-      "style": "red",
-      "author": ""
-    },
-    {
-      "text": "> 纸上得来终觉浅\n> 绝知此事要躬行\n——陆游",
-      "style": "blue",
-      "author": "丽丽"
-    },
-    {
-      "text": "🙏 **祝福**\n希望大家都能实现梦想",
-      "style": "green",
-      "author": "设计师Leo"
-    },
-    {
-      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
-      "style": "indigo",
-      "author": "音乐人"
-    },
-    {
-      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
-      "style": "red",
-      "author": "阿强"
+      "author": "摄影师"
     },
     {
       "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
-      "style": "orange",
-      "author": "音乐人"
+      "style": "amber",
+      "author": "丽丽"
     },
     {
       "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
-      "style": "orange",
-      "author": "向日葵"
-    },
-    {
-      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
       "style": "pink",
-      "author": "追风少年"
-    },
-    {
-      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
-      "style": "purple",
       "author": "阿强"
     },
     {
-      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
-      "style": "teal",
-      "author": "静心"
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "purple",
+      "author": ""
+    },
+    {
+      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
+      "style": "blue",
+      "author": "阿强"
     },
     {
       "text": "**项目进度更新**\n- 完成需求分析\n- 开始原型设计\n预计下周完成 ✅",
-      "style": "amber",
-      "author": "跑步达人"
+      "style": "yellow",
+      "author": "旅行者"
     },
     {
-      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
-      "style": "amber",
-      "author": "追风少年"
-    },
-    {
-      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
-      "style": "purple",
-      "author": "跑步达人"
-    },
-    {
-      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
-      "style": "lime",
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "blue",
       "author": ""
     },
     {
       "text": "**熵的网站**\n[点击访问](https://www.nekt.qzz.io)\n欢迎来玩 🎉",
-      "style": "amber",
-      "author": ""
-    },
-    {
-      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
-      "style": "teal",
-      "author": "大熊"
-    },
-    {
-      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
-      "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
-      "author": ""
-    },
-    {
-      "text": "😌 **放松**\n周末终于可以好好休息了",
-      "style": "teal",
-      "author": "星空"
-    },
-    {
-      "text": "😌 **放松**\n周末终于可以好好休息了",
       "style": "purple",
-      "author": ""
-    },
-    {
-      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
-      "style": "yellow",
-      "author": "流浪的鱼"
-    },
-    {
-      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
-      "style": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=300",
-      "author": "大熊"
-    },
-    {
-      "text": "🤔 **思考**\n如何平衡工作和生活？",
-      "style": "yellow",
-      "author": "摄影师"
-    },
-    {
-      "text": "🤔 **思考**\n如何平衡工作和生活？",
-      "style": "amber",
-      "author": "阿强"
-    },
-    {
-      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
-      "style": "yellow",
       "author": "追风少年"
     },
     {
-      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
-      "style": "purple",
-      "author": "设计师Leo"
-    },
-    {
-      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
-      "style": "pink",
-      "author": ""
-    },
-    {
-      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
-      "style": "blue",
-      "author": "跑步达人"
-    },
-    {
-      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
-      "style": "blue",
-      "author": "摄影师"
-    },
-    {
-      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
-      "style": "red",
-      "author": "向日葵"
-    },
-    {
       "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
-      "style": "blue",
-      "author": "音乐人"
+      "style": "yellow",
+      "author": "丽丽"
     },
     {
-      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "teal",
+      "author": "丽丽"
+    },
+    {
+      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
       "style": "lime",
       "author": "晓雪"
     },
     {
-      "text": "> 纸上得来终觉浅\n> 绝知此事要躬行\n——陆游",
-      "style": "blue",
-      "author": "小猫"
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "yellow",
+      "author": "静心"
     },
     {
-      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
-      "style": "amber",
-      "author": "旅行者"
-    },
-    {
-      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
-      "style": "amber",
-      "author": ""
-    },
-    {
-      "text": "😌 **放松**\n周末终于可以好好休息了",
-      "style": "blue",
-      "author": ""
-    },
-    {
-      "text": "**项目进度更新**\n- 完成需求分析\n- 开始原型设计\n预计下周完成 ✅",
-      "style": "cyan",
-      "author": ""
-    },
-    {
-      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
-      "style": "red",
-      "author": "旅行者"
-    },
-    {
-      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
       "style": "purple",
-      "author": "小猫"
+      "author": "码农一枚"
     },
     {
-      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
-      "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
-      "author": "小猫"
+      "text": "```python\ndef hello():\n    print('Hello World!')\n```\n代码便签测试",
+      "style": "teal",
+      "author": ""
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "cyan",
+      "author": "星空"
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "teal",
+      "author": "音乐人"
     },
     {
       "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "amber",
+      "author": ""
+    },
+    {
+      "text": "💡 **灵感记录**\n可以做一个便签墙应用\n用户可以自由贴便签",
+      "style": "indigo",
+      "author": "小明"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "blue",
+      "author": ""
+    },
+    {
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "purple",
+      "author": "摄影师"
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "teal",
+      "author": "旅行者"
+    },
+    {
+      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
+      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "green",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
+      "style": "amber",
+      "author": "阿强"
+    },
+    {
+      "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
+      "style": "yellow",
+      "author": "小猫"
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "pink",
+      "author": ""
+    },
+    {
+      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "style": "orange",
+      "author": "码农一枚"
+    },
+    {
+      "text": "# 🎯 目标\n## 短期\n学会 React\n## 长期\n成为全栈工程师",
+      "style": "indigo",
+      "author": "小明"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "teal",
+      "author": ""
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "purple",
+      "author": "音乐人"
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "yellow",
+      "author": "摄影师"
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
       "style": "blue",
       "author": "咖啡爱好者"
     },
     {
       "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
-      "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
-      "author": "大熊"
+      "style": "amber",
+      "author": "读书人"
     },
     {
-      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
-      "style": "red",
-      "author": "摄影师"
+      "text": "🤔 **思考**\n如何平衡工作和生活？",
+      "style": "amber",
+      "author": "静心"
     },
     {
-      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
-      "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
-      "author": "旅行者"
-    },
-    {
-      "text": "💡 **灵感记录**\n可以做一个便签墙应用\n用户可以自由贴便签",
-      "style": "orange",
-      "author": "向日葵"
-    },
-    {
-      "text": "**项目进度更新**\n- 完成需求分析\n- 开始原型设计\n预计下周完成 ✅",
-      "style": "green",
-      "author": "小猫"
-    },
-    {
-      "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
-      "style": "pink",
-      "author": ""
-    },
-    {
-      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
-      "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
-      "author": ""
-    },
-    {
-      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
-      "style": "yellow",
-      "author": "晓雪"
-    },
-    {
-      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
-      "style": "red",
-      "author": "追风少年"
-    },
-    {
-      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
       "style": "amber",
       "author": ""
     },
     {
-      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
-      "style": "orange",
-      "author": "追风少年"
-    },
-    {
-      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
-      "style": "teal",
+      "text": "🤔 **思考**\n如何平衡工作和生活？",
+      "style": "green",
       "author": "小猫"
     },
     {
-      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
-      "style": "pink",
-      "author": "码农一枚"
-    },
-    {
-      "text": "**项目进度更新**\n- 完成需求分析\n- 开始原型设计\n预计下周完成 ✅",
-      "style": "pink",
-      "author": "星空"
-    },
-    {
-      "text": "💡 **灵感记录**\n可以做一个便签墙应用\n用户可以自由贴便签",
-      "style": "lime",
-      "author": "读书人"
-    },
-    {
-      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
-      "style": "teal",
-      "author": "读书人"
-    },
-    {
-      "text": "🙏 **祝福**\n希望大家都能实现梦想",
-      "style": "yellow",
-      "author": "星空"
-    },
-    {
-      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
-      "style": "teal",
-      "author": "读书人"
-    },
-    {
-      "text": "**项目进度更新**\n- 完成需求分析\n- 开始原型设计\n预计下周完成 ✅",
+      "text": "🤔 **思考**\n如何平衡工作和生活？",
       "style": "red",
-      "author": "读书人"
-    },
-    {
-      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
-      "style": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=300",
-      "author": ""
-    },
-    {
-      "text": "🙏 **祝福**\n希望大家都能实现梦想",
-      "style": "pink",
-      "author": "摄影师"
-    },
-    {
-      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
-      "style": "lime",
       "author": "静心"
     },
     {
-      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
-      "style": "lime",
+      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
+      "style": "yellow",
+      "author": "摄影师"
+    },
+    {
+      "text": "> 纸上得来终觉浅\n> 绝知此事要躬行\n——陆游",
+      "style": "pink",
+      "author": ""
+    },
+    {
+      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
+      "style": "indigo",
       "author": "小猫"
     },
     {
-      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
-      "style": "blue",
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "pink",
       "author": "大熊"
     },
     {
       "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
-      "style": "red",
+      "style": "green",
+      "author": "码农一枚"
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "green",
       "author": ""
     },
     {
-      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
-      "style": "lime",
-      "author": "丽丽"
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "green",
+      "author": "咖啡爱好者"
     },
     {
-      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
+      "text": "💡 **灵感记录**\n可以做一个便签墙应用\n用户可以自由贴便签",
+      "style": "yellow",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "📖 **读书笔记**\n> 知识改变命运\n今天读完《人类简史》",
+      "style": "blue",
+      "author": "星空"
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "blue",
+      "author": "向日葵"
+    },
+    {
+      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
+      "style": "orange",
+      "author": "星空"
+    },
+    {
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "indigo",
+      "author": "读书人"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "purple",
+      "author": "读书人"
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "yellow",
+      "author": "星空"
+    },
+    {
+      "text": "📖 **读书笔记**\n> 知识改变命运\n今天读完《人类简史》",
+      "style": "purple",
+      "author": ""
+    },
+    {
+      "text": "**项目进度更新**\n- 完成需求分析\n- 开始原型设计\n预计下周完成 ✅",
       "style": "lime",
+      "author": "跑步达人"
+    },
+    {
+      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
+      "style": "blue",
+      "author": "旅行者"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "cyan",
+      "author": ""
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
       "author": "丽丽"
     },
     {
       "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
+      "style": "green",
+      "author": "星空"
+    },
+    {
+      "text": "📖 **读书笔记**\n> 知识改变命运\n今天读完《人类简史》",
+      "style": "cyan",
+      "author": ""
+    },
+    {
+      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
+      "style": "pink",
+      "author": "小猫"
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "pink",
+      "author": "跑步达人"
+    },
+    {
+      "text": "📌 **重要提醒**\n周五下午开会\n记得准备 PPT",
       "style": "yellow",
+      "author": ""
+    },
+    {
+      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
+      "style": "teal",
+      "author": "美食家"
+    },
+    {
+      "text": "💡 **灵感记录**\n可以做一个便签墙应用\n用户可以自由贴便签",
+      "style": "purple",
+      "author": "跑步达人"
+    },
+    {
+      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
+      "style": "blue",
       "author": "阿强"
     },
     {
-      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
-      "style": "orange",
-      "author": "读书人"
+      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
+      "style": "red",
+      "author": "小明"
     },
     {
-      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
-      "style": "orange",
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "yellow",
+      "author": "丽丽"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "lime",
       "author": "音乐人"
     },
     {
-      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
-      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
-      "author": "向日葵"
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "blue",
+      "author": "星空"
+    },
+    {
+      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
+      "style": "yellow",
+      "author": "摄影师"
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "indigo",
+      "author": "美食家"
+    },
+    {
+      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
+      "style": "amber",
+      "author": "静心"
+    },
+    {
+      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
+      "style": "lime",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
+      "style": "red",
+      "author": "阿强"
+    },
+    {
+      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
+      "style": "yellow",
+      "author": ""
+    },
+    {
+      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
+      "style": "amber",
+      "author": "音乐人"
     },
     {
       "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
       "style": "indigo",
-      "author": ""
+      "author": "向日葵"
     },
     {
-      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
-      "style": "indigo",
-      "author": "摄影师"
+      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
+      "style": "red",
+      "author": "静心"
+    },
+    {
+      "text": "**项目进度更新**\n- 完成需求分析\n- 开始原型设计\n预计下周完成 ✅",
+      "style": "amber",
+      "author": ""
     },
     {
       "text": "📖 **读书笔记**\n> 知识改变命运\n今天读完《人类简史》",
       "style": "pink",
-      "author": "码农一枚"
-    },
-    {
-      "text": "😌 **放松**\n周末终于可以好好休息了",
-      "style": "green",
-      "author": "小明"
-    },
-    {
-      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
-      "style": "blue",
-      "author": "码农一枚"
-    },
-    {
-      "text": "📌 **重要提醒**\n周五下午开会\n记得准备 PPT",
-      "style": "purple",
-      "author": ""
-    },
-    {
-      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
-      "style": "teal",
-      "author": "音乐人"
-    },
-    {
-      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
-      "style": "amber",
-      "author": "向日葵"
-    },
-    {
-      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
-      "style": "pink",
-      "author": "晓雪"
-    },
-    {
-      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
-      "style": "yellow",
-      "author": "设计师Leo"
-    },
-    {
-      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
-      "style": "yellow",
       "author": "跑步达人"
     },
     {
-      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
-      "style": "teal",
-      "author": "摄影师"
+      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
+      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
+      "author": "流浪的鱼"
     },
     {
-      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
+      "text": "📖 **读书笔记**\n> 知识改变命运\n今天读完《人类简史》",
       "style": "lime",
-      "author": ""
-    },
-    {
-      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
-      "style": "green",
-      "author": "静心"
-    },
-    {
-      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
-      "style": "cyan",
-      "author": "码农一枚"
-    },
-    {
-      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
-      "style": "teal",
-      "author": "读书人"
-    },
-    {
-      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
-      "style": "cyan",
-      "author": "追风少年"
-    },
-    {
-      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
-      "style": "pink",
-      "author": "小明"
-    },
-    {
-      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
-      "style": "indigo",
-      "author": "摄影师"
-    },
-    {
-      "text": "🙏 **祝福**\n希望大家都能实现梦想",
-      "style": "cyan",
-      "author": ""
-    },
-    {
-      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
-      "style": "amber",
-      "author": "小明"
-    },
-    {
-      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
-      "style": "indigo",
-      "author": "摄影师"
-    },
-    {
-      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
-      "style": "blue",
-      "author": "星空"
-    },
-    {
-      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
-      "style": "green",
-      "author": "阿强"
-    },
-    {
-      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
-      "style": "green",
-      "author": ""
-    },
-    {
-      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
-      "style": "green",
-      "author": ""
-    },
-    {
-      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
-      "style": "indigo",
-      "author": "咖啡爱好者"
+      "author": "大熊"
     },
     {
       "text": "📌 **重要提醒**\n周五下午开会\n记得准备 PPT",
-      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
+      "style": "cyan",
       "author": "美食家"
     },
     {
-      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
-      "style": "blue",
-      "author": "静心"
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "red",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
+      "style": "yellow",
+      "author": "追风少年"
     },
     {
       "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
       "style": "orange",
-      "author": "流浪的鱼"
-    },
-    {
-      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
-      "style": "yellow",
       "author": "音乐人"
     },
     {
-      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
-      "style": "amber",
-      "author": ""
-    },
-    {
-      "text": "# 🎯 目标\n## 短期\n学会 React\n## 长期\n成为全栈工程师",
-      "style": "green",
-      "author": ""
-    },
-    {
-      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
-      "style": "green",
-      "author": ""
-    },
-    {
-      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
       "style": "orange",
-      "author": "设计师Leo"
-    },
-    {
-      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
-      "style": "indigo",
-      "author": "旅行者"
-    },
-    {
-      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
-      "style": "yellow",
-      "author": "旅行者"
-    },
-    {
-      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
-      "style": "yellow",
       "author": "小明"
     },
     {
-      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
-      "style": "yellow",
-      "author": "向日葵"
+      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
+      "style": "teal",
+      "author": "咖啡爱好者"
     },
     {
-      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
-      "style": "yellow",
-      "author": "跑步达人"
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "lime",
+      "author": "流浪的鱼"
     },
     {
-      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
-      "style": "green",
-      "author": "丽丽"
-    },
-    {
-      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
-      "style": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=300",
-      "author": "跑步达人"
-    },
-    {
-      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
-      "style": "green",
+      "text": "**项目进度更新**\n- 完成需求分析\n- 开始原型设计\n预计下周完成 ✅",
+      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
       "author": ""
+    },
+    {
+      "text": "```python\ndef hello():\n    print('Hello World!')\n```\n代码便签测试",
+      "style": "blue",
+      "author": "跑步达人"
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "blue",
+      "author": "静心"
+    },
+    {
+      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
+      "style": "pink",
+      "author": "晓雪"
+    },
+    {
+      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "style": "orange",
+      "author": "读书人"
+    },
+    {
+      "text": "🤔 **思考**\n如何平衡工作和生活？",
+      "style": "cyan",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "**项目进度更新**\n- 完成需求分析\n- 开始原型设计\n预计下周完成 ✅",
+      "style": "cyan",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "indigo",
+      "author": ""
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "green",
+      "author": "晓雪"
     },
     {
       "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
-      "style": "blue",
-      "author": "码农一枚"
-    },
-    {
-      "text": "# 🎯 目标\n## 短期\n学会 React\n## 长期\n成为全栈工程师",
-      "style": "lime",
-      "author": ""
-    },
-    {
-      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
-      "style": "purple",
-      "author": "跑步达人"
-    },
-    {
-      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
-      "style": "green",
+      "style": "indigo",
       "author": ""
     },
     {
       "text": "🌟 **随想**\n人生短暂，要做有意义的事",
       "style": "teal",
-      "author": "码农一枚"
-    },
-    {
-      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
-      "style": "blue",
-      "author": "美食家"
-    },
-    {
-      "text": "🤔 **思考**\n如何平衡工作和生活？",
-      "style": "teal",
-      "author": "音乐人"
-    },
-    {
-      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
-      "style": "cyan",
-      "author": "摄影师"
-    },
-    {
-      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
-      "style": "amber",
-      "author": "大熊"
-    },
-    {
-      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
-      "style": "orange",
-      "author": "晓雪"
-    },
-    {
-      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
-      "style": "amber",
-      "author": "丽丽"
-    },
-    {
-      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
-      "style": "cyan",
-      "author": "音乐人"
-    },
-    {
-      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
-      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
-      "author": "流浪的鱼"
+      "author": ""
     },
     {
       "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "cyan",
+      "author": "丽丽"
+    },
+    {
+      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
+      "style": "pink",
+      "author": "跑步达人"
+    },
+    {
+      "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
+      "style": "cyan",
+      "author": "丽丽"
+    },
+    {
+      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
+      "style": "orange",
+      "author": ""
+    },
+    {
+      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
+      "style": "blue",
+      "author": "晓雪"
+    },
+    {
+      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
+      "style": "red",
+      "author": "码农一枚"
+    },
+    {
+      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
+      "style": "blue",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
+      "style": "yellow",
+      "author": "小明"
+    },
+    {
+      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
+      "style": "green",
+      "author": "向日葵"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
       "style": "green",
       "author": ""
     },
     {
-      "text": "💡 **灵感记录**\n可以做一个便签墙应用\n用户可以自由贴便签",
-      "style": "teal",
-      "author": "读书人"
+      "text": "🤔 **思考**\n如何平衡工作和生活？",
+      "style": "blue",
+      "author": "咖啡爱好者"
     },
     {
-      "text": "😌 **放松**\n周末终于可以好好休息了",
-      "style": "indigo",
-      "author": "小明"
+      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
+      "style": "yellow",
+      "author": "追风少年"
     },
     {
-      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
-      "style": "lime",
-      "author": "码农一枚"
-    },
-    {
-      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
-      "style": "cyan",
-      "author": ""
+      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
+      "style": "orange",
+      "author": "丽丽"
     },
     {
       "text": "> 纸上得来终觉浅\n> 绝知此事要躬行\n——陆游",
-      "style": "cyan",
+      "style": "indigo",
       "author": "星空"
     },
     {
-      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=300",
+      "author": "丽丽"
+    },
+    {
+      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
+      "style": "cyan",
+      "author": "码农一枚"
+    },
+    {
+      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
+      "style": "indigo",
+      "author": "音乐人"
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "green",
+      "author": "小猫"
+    },
+    {
+      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
+      "style": "pink",
+      "author": "小猫"
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
+      "author": ""
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "teal",
+      "author": ""
+    },
+    {
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "amber",
+      "author": "晓雪"
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "orange",
+      "author": ""
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "pink",
+      "author": "码农一枚"
+    },
+    {
+      "text": "🤔 **思考**\n如何平衡工作和生活？",
+      "style": "purple",
+      "author": ""
+    },
+    {
+      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
+      "style": "pink",
+      "author": "跑步达人"
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "orange",
+      "author": "音乐人"
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
       "style": "amber",
       "author": "丽丽"
     },
     {
-      "text": "🤔 **思考**\n如何平衡工作和生活？",
-      "style": "lime",
-      "author": "音乐人"
-    },
-    {
-      "text": "😌 **放松**\n周末终于可以好好休息了",
-      "style": "indigo",
-      "author": ""
-    },
-    {
-      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
-      "style": "yellow",
-      "author": "晓雪"
-    },
-    {
-      "text": "# 🎯 目标\n## 短期\n学会 React\n## 长期\n成为全栈工程师",
-      "style": "pink",
-      "author": "静心"
-    },
-    {
-      "text": "📌 **重要提醒**\n周五下午开会\n记得准备 PPT",
-      "style": "indigo",
-      "author": "晓雪"
-    },
-    {
-      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
-      "style": "yellow",
-      "author": "读书人"
-    },
-    {
-      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
-      "style": "indigo",
-      "author": ""
-    },
-    {
-      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
-      "style": "lime",
-      "author": "丽丽"
-    },
-    {
-      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
       "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
+      "author": ""
+    },
+    {
+      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
+      "style": "amber",
       "author": "小猫"
     },
     {
-      "text": "🤔 **思考**\n如何平衡工作和生活？",
-      "style": "lime",
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "orange",
+      "author": "向日葵"
+    },
+    {
+      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
+      "style": "blue",
+      "author": "跑步达人"
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "cyan",
       "author": ""
     },
     {
-      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "purple",
+      "author": "旅行者"
+    },
+    {
+      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
+      "style": "blue",
+      "author": "小明"
+    },
+    {
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "teal",
+      "author": "阿强"
+    },
+    {
+      "text": "**熵的网站**\n[点击访问](https://www.nekt.qzz.io)\n欢迎来玩 🎉",
+      "style": "indigo",
+      "author": ""
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "amber",
+      "author": "追风少年"
+    },
+    {
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "teal",
+      "author": "晓雪"
+    },
+    {
+      "text": "**熵的网站**\n[点击访问](https://www.nekt.qzz.io)\n欢迎来玩 🎉",
+      "style": "red",
+      "author": ""
+    },
+    {
+      "text": "📌 **重要提醒**\n周五下午开会\n记得准备 PPT",
+      "style": "amber",
+      "author": "旅行者"
+    },
+    {
+      "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
+      "style": "purple",
+      "author": "大熊"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "yellow",
+      "author": ""
+    },
+    {
+      "text": "**熵的网站**\n[点击访问](https://www.nekt.qzz.io)\n欢迎来玩 🎉",
+      "style": "red",
+      "author": "丽丽"
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "green",
+      "author": "跑步达人"
+    },
+    {
+      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
       "style": "red",
       "author": "星空"
     },
     {
-      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
       "style": "yellow",
-      "author": "音乐人"
+      "author": "读书人"
     },
     {
-      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
-      "style": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=300",
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "lime",
+      "author": "小明"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "red",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
+      "style": "orange",
+      "author": "旅行者"
+    },
+    {
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "orange",
+      "author": "美食家"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "amber",
       "author": ""
     },
     {
+      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
+      "style": "purple",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "cyan",
+      "author": "跑步达人"
+    },
+    {
+      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
+      "style": "yellow",
+      "author": "追风少年"
+    },
+    {
+      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
+      "style": "indigo",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "blue",
+      "author": "丽丽"
+    },
+    {
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
+      "author": "向日葵"
+    },
+    {
+      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
+      "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
+      "author": "码农一枚"
+    },
+    {
+      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
+      "style": "purple",
+      "author": "向日葵"
+    },
+    {
+      "text": "💡 **灵感记录**\n可以做一个便签墙应用\n用户可以自由贴便签",
+      "style": "teal",
+      "author": "摄影师"
+    },
+    {
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "yellow",
+      "author": "码农一枚"
+    },
+    {
+      "text": "📌 **重要提醒**\n周五下午开会\n记得准备 PPT",
+      "style": "pink",
+      "author": "小猫"
+    },
+    {
+      "text": "```python\ndef hello():\n    print('Hello World!')\n```\n代码便签测试",
+      "style": "yellow",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "style": "blue",
+      "author": "静心"
+    },
+    {
+      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
+      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
+      "author": "跑步达人"
+    },
+    {
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "cyan",
+      "author": ""
+    },
+    {
+      "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
+      "style": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=300",
+      "author": "星空"
+    },
+    {
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "orange",
+      "author": ""
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "amber",
+      "author": "美食家"
+    },
+    {
+      "text": "📖 **读书笔记**\n> 知识改变命运\n今天读完《人类简史》",
+      "style": "pink",
+      "author": "追风少年"
+    },
+    {
+      "text": "📌 **重要提醒**\n周五下午开会\n记得准备 PPT",
+      "style": "yellow",
+      "author": "星空"
+    },
+    {
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "red",
+      "author": "音乐人"
+    },
+    {
       "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "blue",
+      "author": "大熊"
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "purple",
+      "author": "码农一枚"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
       "style": "blue",
       "author": "追风少年"
     },
     {
       "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
-      "style": "red",
+      "style": "indigo",
+      "author": "旅行者"
+    },
+    {
+      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
+      "style": "amber",
+      "author": "丽丽"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "green",
+      "author": "音乐人"
+    },
+    {
+      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
+      "style": "orange",
+      "author": "码农一枚"
+    },
+    {
+      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
+      "style": "yellow",
       "author": "晓雪"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "pink",
+      "author": "旅行者"
+    },
+    {
+      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
+      "style": "red",
+      "author": "摄影师"
+    },
+    {
+      "text": "**熵的网站**\n[点击访问](https://www.nekt.qzz.io)\n欢迎来玩 🎉",
+      "style": "teal",
+      "author": "码农一枚"
+    },
+    {
+      "text": "🌈 **心情**\n今天阳光很好\n心情也很好 😊",
+      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
+      "author": ""
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "purple",
+      "author": "摄影师"
+    },
+    {
+      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
+      "style": "orange",
+      "author": ""
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "amber",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
+      "style": "purple",
+      "author": "静心"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "green",
+      "author": ""
+    },
+    {
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "amber",
+      "author": "丽丽"
+    },
+    {
+      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
+      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
+      "author": ""
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "teal",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
+      "style": "teal",
+      "author": "摄影师"
+    },
+    {
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "orange",
+      "author": "小猫"
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "green",
+      "author": ""
+    },
+    {
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "blue",
+      "author": ""
+    },
+    {
+      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
+      "style": "pink",
+      "author": "丽丽"
+    },
+    {
+      "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
+      "style": "cyan",
+      "author": "美食家"
     },
     {
       "text": "# 🎯 目标\n## 短期\n学会 React\n## 长期\n成为全栈工程师",
       "style": "yellow",
+      "author": "音乐人"
+    },
+    {
+      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "style": "indigo",
+      "author": "跑步达人"
+    },
+    {
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "teal",
+      "author": "小猫"
+    },
+    {
+      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "style": "indigo",
+      "author": ""
+    },
+    {
+      "text": "> 纸上得来终觉浅\n> 绝知此事要躬行\n——陆游",
+      "style": "blue",
+      "author": ""
+    },
+    {
+      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
+      "style": "purple",
+      "author": ""
+    },
+    {
+      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
+      "style": "green",
+      "author": ""
+    },
+    {
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "blue",
       "author": "大熊"
     },
     {
+      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
+      "style": "teal",
+      "author": "读书人"
+    },
+    {
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "orange",
+      "author": "读书人"
+    },
+    {
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "green",
+      "author": "美食家"
+    },
+    {
       "text": "📊 **周报总结**\n本周完成 3 个功能模块\n遇到的问题已解决",
+      "style": "orange",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
       "style": "amber",
+      "author": "丽丽"
+    },
+    {
+      "text": "🤔 **思考**\n如何平衡工作和生活？",
+      "style": "amber",
+      "author": ""
+    },
+    {
+      "text": "📌 **重要提醒**\n周五下午开会\n记得准备 PPT",
+      "style": "pink",
+      "author": "音乐人"
+    },
+    {
+      "text": "**Markdown 测试**\n*斜体* **粗体** ~~删除~~\n- 列表项 1\n- 列表项 2",
+      "style": "amber",
+      "author": "追风少年"
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "cyan",
+      "author": "小明"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "orange",
+      "author": "音乐人"
+    },
+    {
+      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
+      "style": "lime",
+      "author": "星空"
+    },
+    {
+      "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
+      "style": "blue",
+      "author": "阿强"
+    },
+    {
+      "text": "📌 **重要提醒**\n周五下午开会\n记得准备 PPT",
+      "style": "orange",
+      "author": "旅行者"
+    },
+    {
+      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
+      "style": "yellow",
+      "author": "跑步达人"
+    },
+    {
+      "text": "```python\ndef hello():\n    print('Hello World!')\n```\n代码便签测试",
+      "style": "indigo",
+      "author": "阿强"
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "red",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "indigo",
+      "author": "大熊"
+    },
+    {
+      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
+      "style": "orange",
+      "author": "阿强"
+    },
+    {
+      "text": "🎬 **观影记录**\n看了《肖申克的救赎》\n经典之作！",
+      "style": "orange",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "blue",
+      "author": "音乐人"
+    },
+    {
+      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
+      "style": "amber",
+      "author": "阿强"
+    },
+    {
+      "text": "📌 **重要提醒**\n周五下午开会\n记得准备 PPT",
+      "style": "yellow",
+      "author": "星空"
+    },
+    {
+      "text": "**项目进度更新**\n- 完成需求分析\n- 开始原型设计\n预计下周完成 ✅",
+      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
+      "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
+      "author": ""
+    },
+    {
+      "text": "✨ **新技能**\n学会了用 Vim\n效率提升好多",
+      "style": "yellow",
+      "author": "阿强"
+    },
+    {
+      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
+      "style": "amber",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "💖 **感恩**\n感谢身边人的支持\n很幸运遇见你们",
+      "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
+      "author": "星空"
+    },
+    {
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "purple",
+      "author": "小明"
+    },
+    {
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "yellow",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
+      "style": "amber",
+      "author": ""
+    },
+    {
+      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
+      "style": "purple",
+      "author": "晓雪"
+    },
+    {
+      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
+      "style": "yellow",
+      "author": "丽丽"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "cyan",
+      "author": ""
+    },
+    {
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "amber",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "orange",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "indigo",
+      "author": "小猫"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "indigo",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "📚 **今日学习**\n完成 Python 第 3 章\n明天继续 💪",
+      "style": "teal",
+      "author": ""
+    },
+    {
+      "text": "📖 **读书笔记**\n> 知识改变命运\n今天读完《人类简史》",
+      "style": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=300",
+      "author": "晓雪"
+    },
+    {
+      "text": "📝 **笔记整理**\n把这周的知识点总结了一遍",
+      "style": "amber",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "orange",
+      "author": "阿强"
+    },
+    {
+      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
+      "style": "purple",
+      "author": "旅行者"
+    },
+    {
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "teal",
+      "author": "星空"
+    },
+    {
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "indigo",
+      "author": "追风少年"
+    },
+    {
+      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
+      "style": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300",
+      "author": ""
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "teal",
+      "author": "小明"
+    },
+    {
+      "text": "🌟 **随想**\n人生短暂，要做有意义的事",
+      "style": "cyan",
+      "author": "旅行者"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "amber",
+      "author": "静心"
+    },
+    {
+      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
+      "style": "red",
+      "author": "读书人"
+    },
+    {
+      "text": "🙏 **祝福**\n希望大家都能实现梦想",
+      "style": "teal",
+      "author": "晓雪"
+    },
+    {
+      "text": "💡 **灵感记录**\n可以做一个便签墙应用\n用户可以自由贴便签",
+      "style": "amber",
+      "author": "跑步达人"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "red",
+      "author": "跑步达人"
+    },
+    {
+      "text": "😌 **放松**\n周末终于可以好好休息了",
+      "style": "amber",
+      "author": "摄影师"
+    },
+    {
+      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
+      "style": "indigo",
+      "author": "小明"
+    },
+    {
+      "text": "🏃 **运动打卡**\n晨跑 5 公里\n感觉神清气爽！",
+      "style": "yellow",
+      "author": "摄影师"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "green",
+      "author": ""
+    },
+    {
+      "text": "✨ **创意**\n设计一个简洁的 UI\n用渐变色和圆角",
+      "style": "red",
+      "author": "小猫"
+    },
+    {
+      "text": "⏰ **deadline**\n月底前完成项目\n时间紧迫！",
+      "style": "green",
+      "author": "码农一枚"
+    },
+    {
+      "text": "💡 **灵感记录**\n可以做一个便签墙应用\n用户可以自由贴便签",
+      "style": "green",
+      "author": "码农一枚"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "lime",
+      "author": "大熊"
+    },
+    {
+      "text": "> 纸上得来终觉浅\n> 绝知此事要躬行\n——陆游",
+      "style": "indigo",
+      "author": "美食家"
+    },
+    {
+      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
+      "style": "green",
+      "author": "小明"
+    },
+    {
+      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "style": "orange",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "# 🎯 目标\n## 短期\n学会 React\n## 长期\n成为全栈工程师",
+      "style": "green",
+      "author": "静心"
+    },
+    {
+      "text": "✅ **本周待办**\n- [ ] 完成项目报告\n- [x] 健身 3 次\n- [ ] 整理房间",
+      "style": "amber",
+      "author": "星空"
+    },
+    {
+      "text": "📖 **读书笔记**\n> 知识改变命运\n今天读完《人类简史》",
+      "style": "blue",
+      "author": "阿强"
+    },
+    {
+      "text": "> 纸上得来终觉浅\n> 绝知此事要躬行\n——陆游",
+      "style": "orange",
+      "author": "设计师Leo"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
+      "author": "码农一枚"
+    },
+    {
+      "text": "**Markdown 测试**\n*斜体* **粗体** ~~删除~~\n- 列表项 1\n- 列表项 2",
+      "style": "amber",
+      "author": "丽丽"
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "teal",
+      "author": "咖啡爱好者"
+    },
+    {
+      "text": "```python\ndef hello():\n    print('Hello World!')\n```\n代码便签测试",
+      "style": "amber",
+      "author": "阿强"
+    },
+    {
+      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
+      "style": "green",
+      "author": "跑步达人"
+    },
+    {
+      "text": "🍜 **美食发现**\n找到一家超好吃的拉面店\n下次带朋友去",
+      "style": "green",
+      "author": "向日葵"
+    },
+    {
+      "text": "🎯 **学习计划**\n每天学习 2 小时\n坚持一个月",
+      "style": "cyan",
+      "author": "小明"
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "teal",
       "author": "音乐人"
     },
     {
       "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
-      "style": "orange",
-      "author": "设计师Leo"
+      "style": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300",
+      "author": ""
+    },
+    {
+      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
+      "style": "purple",
+      "author": "摄影师"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "purple",
+      "author": "音乐人"
+    },
+    {
+      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "style": "green",
+      "author": "码农一枚"
+    },
+    {
+      "text": "**熵的网站**\n[点击访问](https://www.nekt.qzz.io)\n欢迎来玩 🎉",
+      "style": "blue",
+      "author": ""
+    },
+    {
+      "text": "💡 **灵感记录**\n可以做一个便签墙应用\n用户可以自由贴便签",
+      "style": "purple",
+      "author": "阿强"
+    },
+    {
+      "text": "💪 **加油**\n遇到困难不放弃\n继续努力！",
+      "style": "purple",
+      "author": ""
+    },
+    {
+      "text": "💻 **学习笔记**\n- 掌握 React Hooks\n- 理解虚拟 DOM 原理",
+      "style": "cyan",
+      "author": "星空"
+    },
+    {
+      "text": "✅ **今日完成**\n- 代码 review\n- 修复 2 个 bug\n- 更新文档",
+      "style": "green",
+      "author": "追风少年"
+    },
+    {
+      "text": "```python\ndef hello():\n    print('Hello World!')\n```\n代码便签测试",
+      "style": "green",
+      "author": "晓雪"
+    },
+    {
+      "text": "**熵的网站**\n[点击访问](https://www.nekt.qzz.io)\n欢迎来玩 🎉",
+      "style": "lime",
+      "author": ""
+    },
+    {
+      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
+      "style": "yellow",
+      "author": "摄影师"
+    },
+    {
+      "text": "☕ **咖啡时光**\n在星巴克坐了一下午\n完成了两篇文章",
+      "style": "cyan",
+      "author": "流浪的鱼"
+    },
+    {
+      "text": "⚡ **紧急任务**\n明天下午 3 点前提交方案",
+      "style": "teal",
+      "author": ""
+    },
+    {
+      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
+      "style": "purple",
+      "author": "阿强"
+    },
+    {
+      "text": "💭 **感悟**\n> 简单即美\n越简单的东西越难做好",
+      "style": "red",
+      "author": "大熊"
+    },
+    {
+      "text": "🎯 **下周计划**\n1. 学习新框架\n2. 完成设计稿\n3. 写技术博客",
+      "style": "green",
+      "author": "大熊"
+    },
+    {
+      "text": "💡 **会议纪要**\n- 讨论产品方向\n- 确定下季度 OKR",
+      "style": "yellow",
+      "author": "丽丽"
+    },
+    {
+      "text": "📝 **购物清单**\n- 牛奶\n- 面包\n- 水果\n- 咖啡豆",
+      "style": "cyan",
+      "author": ""
     }
   ],
   "meta": {
-    "count": 200,
+    "count": 500,
     "generated": "2026-02-18",
     "version": "2.0"
   }
