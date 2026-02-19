@@ -81,7 +81,7 @@
             color: #2d241b;
             border-radius: 5px 20px 12px 8px;
             transform-origin: 0 0;
-            transition: transform 0.25s ease-out, box-shadow 0.1s, filter 0.1s;
+            transition: left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), top 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.25s ease-out, box-shadow 0.1s, filter 0.1s;
             cursor: grab;
             word-wrap: break-word;
             z-index: 1;
@@ -799,6 +799,8 @@
                 const noteTop  = top  !== null ? top  : random(200, WALL_HEIGHT - 200);
                 note.style.left = noteLeft + 'px';
                 note.style.top  = noteTop  + 'px';
+                // 确保便签有明确定位，防止拖动时坐标错乱
+                note.style.position = 'absolute';
                 note.style.zIndex = Math.floor(random(10, 500));
 
                 // ── 正文内容 ──
@@ -882,15 +884,19 @@
                 const dx = clientX - dragStartX, dy = clientY - dragStartY;
                 if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragHasMoved = true;
 
+                // 计算最终位置（带边界限制）
                 let newLeft = Math.min(WALL_WIDTH - 30,  Math.max(-NOTE_W + 30, dragInitLeft + dx));
                 let newTop  = Math.min(WALL_HEIGHT - 30, Math.max(-NOTE_H + 30, dragInitTop  + dy));
 
-                // rAF 节流写 DOM：拖拽中禁用 transition，用 translate 即时移动
+                // rAF 节流：拖拽中用 translate 相对偏移（相对于原始 left/top）
                 if (dragRafId) cancelAnimationFrame(dragRafId);
                 dragRafId = requestAnimationFrame(() => {
                     if (dragNote) {
                         dragNote.style.transition = 'none';
-                        dragNote.style.transform = `translate(${newLeft}px, ${newTop}px)`;
+                        // translate 用相对偏移量，而非绝对位置
+                        const offsetX = newLeft - dragInitLeft;
+                        const offsetY = newTop - dragInitTop;
+                        dragNote.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
                     }
                 });
             }
@@ -901,28 +907,43 @@
                 const note = dragNote;
                 dragNote = null;
                 dragRafId = null;
+                
                 if (!dragHasMoved) {
+                    // 未移动，直接恢复
+                    note.style.transform = '';
                     note.style.transition = '';
                     return;
                 }
 
-                // 读取当前 translate 位置（如果有）
-                let curX = dragInitLeft, curY = dragInitTop;
+                // 读取当前 translate 偏移量
+                let offsetX = 0, offsetY = 0;
                 const m = note.style.transform.match(/translate\(([^,]+)px,\s*([^)]+)px\)/);
                 if (m) {
-                    curX = parseFloat(m[1]);
-                    curY = parseFloat(m[2]);
+                    offsetX = parseFloat(m[1]);
+                    offsetY = parseFloat(m[2]);
                 }
 
-                // 应用速度衰减
-                let finalX = Math.min(WALL_WIDTH-30, Math.max(-NOTE_W+30, curX + dragVX * 0.5));
-                let finalY = Math.min(WALL_HEIGHT-30, Math.max(-NOTE_H+30, curY + dragVY * 0.5));
+                // 当前绝对位置 = 初始位置 + translate 偏移
+                let curX = dragInitLeft + offsetX;
+                let curY = dragInitTop + offsetY;
 
-                // 写回 left/top，清除 translate
+                // 应用速度衰减（粘滞效果）
+                // 速度衰减系数 0.6（值越大惯性越强，0-1）
+                let finalX = curX + dragVX * 0.6;
+                let finalY = curY + dragVY * 0.6;
+
+                // 边界限制
+                finalX = Math.min(WALL_WIDTH - 30, Math.max(-NOTE_W + 30, finalX));
+                finalY = Math.min(WALL_HEIGHT - 30, Math.max(-NOTE_H + 30, finalY));
+
+                // 写回 left/top，清除 translate，启用 transition 做平滑过渡
                 note.style.left = finalX + 'px';
                 note.style.top  = finalY + 'px';
                 note.style.transform = '';
-                note.style.transition = '';  // 恢复默认
+                // 显式启用 transition 实现粘滞效果
+                note.style.transition = 'left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), top 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                // 0.3s 后清除 transition，避免后续操作带动画
+                setTimeout(() => { note.style.transition = ''; }, 320);
             }
 
             // wall 层统一委托 mousedown / touchstart
