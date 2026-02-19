@@ -34,7 +34,7 @@
             overflow: hidden;  /* 完全禁用滚动，用 transform 控制 */
             position: relative;
             touch-action: none;
-            background: linear-gradient(to bottom, #87ceeb, #b0e0e6);
+            background: #9dd1e0;  /* 单色背景，避免渐变重绘 */
             cursor: grab;
         }
         .wall-wrapper:active {
@@ -51,9 +51,10 @@
             background-color: #b08a67;
             background-repeat: repeat;
             background-size: 300px 300px;
+            background-attachment: local;  /* 避免背景图随滚动重绘 */
             box-shadow: inset 0 0 0 4px #5a3f2e;
-            transform-origin: center center;  /* 中心缩放，配合 translate(-50%, -50%) */
-            transform: translate(-50%, -50%) scale(1);
+            transform-origin: center center;
+            transform: translate3d(-50%, -50%, 0) scale(1);  /* translate3d 触发 GPU */
             will-change: transform;
             cursor: grab;
             backface-visibility: hidden;  /* 强制 GPU 层 */
@@ -88,7 +89,8 @@
             will-change: transform;  /* 改为 transform，拖动用 translate */
             overflow: hidden;
             touch-action: none;
-            contain: layout style;   /* 隔离 reflow 影响 */
+            contain: layout style paint;  /* 完全隔离，避免影响其他便签 */
+            content-visibility: auto;     /* 浏览器自动优化不可见便签 */
         }
         
         /* 带图片背景的便签 */
@@ -798,7 +800,7 @@
 
 
             // ── 虚拟滚动管理器：大量便签时只渲染可见区域 ──
-            const BUFFER = 1000;  // 视口外扩 1000px 缓冲区（减少闪烁）
+            const BUFFER = 2000;  // 视口外扩 2000px 缓冲区（避免频繁切换）
             let allNotesData = [];  // 所有便签的原始数据
             let renderedNotes = new Map();  // noteId → DOM element
             let viewportCheckTimer = null;
@@ -876,10 +878,10 @@
                 renderedNotes.set(data.id, note);
             }
 
-            // 缩放/拖动后延迟触发（500ms debounce，减少闪烁）
+            // 缩放/拖动后延迟触发（1000ms debounce，避免频繁检查）
             function scheduleViewportCheck() {
                 if (viewportCheckTimer) clearTimeout(viewportCheckTimer);
-                viewportCheckTimer = setTimeout(updateVisibleNotes, 500);
+                viewportCheckTimer = setTimeout(updateVisibleNotes, 1000);
             }
 
             // ── 图片背景懒加载（Intersection Observer）──
@@ -892,11 +894,15 @@
                             const note = entry.target;
                             const imgUrl = note.dataset.bgImg;
                             if (imgUrl) {
+                                // 预加载图片
                                 const img = new Image();
+                                img.decoding = 'async';  // 异步解码，不阻塞主线程
                                 img.onload = () => {
-                                    note.style.setProperty('background-image', `url("${imgUrl}")`, 'important');
-                                    note.classList.add('img-loaded');
-                                    delete note.dataset.bgImg;
+                                    requestAnimationFrame(() => {
+                                        note.style.setProperty('background-image', `url("${imgUrl}")`, 'important');
+                                        note.classList.add('img-loaded');
+                                        delete note.dataset.bgImg;
+                                    });
                                 };
                                 img.onerror = () => note.classList.add('img-error');
                                 img.src = imgUrl;
@@ -906,7 +912,7 @@
                     });
                 }, { 
                     root: wrapper,
-                    rootMargin: '500px',  // 提前 500px 加载（快速滚动时提前触发）
+                    rootMargin: '300px',  // 提前 300px 加载
                     threshold: 0
                 });
             }
@@ -1132,7 +1138,7 @@
                 });
             }
 
-            // 初始化便签（少量直接渲染，大量分批+虚拟滚动）
+            // 初始化便签（全部直接渲染，禁用虚拟滚动）
             function initDefaultNotes(data = null) {
                 if (!data || !data.notes) return;
                 
@@ -1148,44 +1154,25 @@
                     top: null
                 }));
                 
-                // 少量便签（≤50）：直接全部渲染
-                if (noteCount <= 50) {
-                    const frag = document.createDocumentFragment();
-                    data.notes.forEach((item, i) => {
-                        const note = createNote(
-                            item.text,
-                            null, null, null,
-                            item.style  || 'yellow',
-                            item.author || ''
-                        );
-                        note.dataset.noteId = `note-${i}`;
-                        // 保存位置用于搜索定位
-                        const left = parseFloat(note.style.left) || 0;
-                        const top = parseFloat(note.style.top) || 0;
-                        allNotesForSearch[i].left = left;
-                        allNotesForSearch[i].top = top;
-                        frag.appendChild(note);
-                    });
-                    wall.appendChild(frag);
-                    console.log(`✓ 已渲染 ${noteCount} 张便签（直接模式）`);
-                    return;
-                }
-                
-                // 大量便签（>50）：启用虚拟滚动
-                allNotesData = [];
+                // 全部直接渲染（禁用虚拟滚动）
+                const frag = document.createDocumentFragment();
                 data.notes.forEach((item, i) => {
-                    const noteData = addNoteData(
+                    const note = createNote(
                         item.text,
+                        null, null, null,
                         item.style  || 'yellow',
                         item.author || ''
                     );
-                    // 同步位置信息
-                    if (noteData) {
-                        allNotesForSearch[i].left = noteData.left;
-                        allNotesForSearch[i].top = noteData.top;
-                    }
+                    note.dataset.noteId = `note-${i}`;
+                    // 保存位置用于搜索定位
+                    const left = parseFloat(note.style.left) || 0;
+                    const top = parseFloat(note.style.top) || 0;
+                    allNotesForSearch[i].left = left;
+                    allNotesForSearch[i].top = top;
+                    frag.appendChild(note);
                 });
-                renderInBatches();
+                wall.appendChild(frag);
+                console.log(`✓ 已渲染 ${noteCount} 张便签`);
             }
 
             function renderInBatches() {
@@ -1263,6 +1250,7 @@
                 const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
                 if (vw === 0 || vh === 0) return;
                 const oldScale = currentScale;
+                
 
                 // 确定缩放锚点
                 let focusX = vw / 2, focusY = vh / 2;
@@ -1291,22 +1279,9 @@
                 zoomSpan.innerText = Math.round(newScale * 100) + '%';
             }
 
-            let lastCheckX = 0, lastCheckY = 0, lastCheckScale = 1;
             function applyWallTransform(scale) {
-                wall.style.transform = `translate(calc(-50% + ${wallTranslateX}px), calc(-50% + ${wallTranslateY}px)) scale(${scale})`;
-                // 只在虚拟滚动启用且移动/缩放幅度足够时才触发检查
-                if (allNotesData && allNotesData.length > 50) {
-                    const dx = Math.abs(wallTranslateX - lastCheckX);
-                    const dy = Math.abs(wallTranslateY - lastCheckY);
-                    const ds = Math.abs(scale - lastCheckScale);
-                    // 移动超过 200px 或缩放变化超过 0.1 才检查
-                    if (dx > 200 || dy > 200 || ds > 0.1) {
-                        scheduleViewportCheck();
-                        lastCheckX = wallTranslateX;
-                        lastCheckY = wallTranslateY;
-                        lastCheckScale = scale;
-                    }
-                }
+                wall.style.transform = `translate3d(calc(-50% + ${wallTranslateX}px), calc(-50% + ${wallTranslateY}px), 0) scale(${scale})`;
+                // 虚拟滚动已禁用，无需检查
             }
 
             // 滑块事件（节流，避免高频触发）
@@ -1464,7 +1439,7 @@
                     initDefaultNotes(data);
                     
                     // 少量便签（≤50）立即关闭 loading
-                    if (noteCount <= 50) {
+                    if (noteCount <= 100) {
                         setTimeout(() => {
                             if (loading) loading.style.display = 'none';
                         }, 200);
