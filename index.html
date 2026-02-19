@@ -541,6 +541,92 @@
             }
         }
     
+
+        /* 导航图标 */
+        .nav-icon {
+            position: fixed;
+            width: 44px;
+            height: 44px;
+            background: rgba(255,250,240,0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 25000;
+            border: 2px solid #d4b57e;
+        }
+        .nav-icon:hover {
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            background: #fff;
+        }
+        .nav-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: #8b6f47;
+        }
+        .home-icon { top: 16px; left: 16px; }
+        .search-icon { top: 16px; right: 70px; }
+        .help-icon { top: 16px; right: 16px; }
+
+        /* 搜索面板 */
+        .search-panel {
+            position: fixed;
+            top: 70px;
+            right: 16px;
+            width: 320px;
+            max-height: 400px;
+            background: rgba(254,247,233,0.98);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            padding: 16px;
+            z-index: 26000;
+            display: none;
+            border: 2px solid #d4b57e;
+        }
+        .search-panel input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #c9a86c;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            background: #fff;
+        }
+        .search-results {
+            margin-top: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .search-result-item {
+            padding: 8px 10px;
+            margin: 4px 0;
+            background: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            border: 1px solid #e8d5b7;
+            transition: all 0.15s;
+        }
+        .search-result-item:hover {
+            background: #f5e9d3;
+            border-color: #c9a86c;
+        }
+        .search-result-item .result-text {
+            color: #5a4a38;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .search-result-item .result-author {
+            font-size: 0.75rem;
+            color: #9e8870;
+            margin-top: 4px;
+        }
         /* 移动端优化 */
         @media (max-width: 768px) {
             .note {
@@ -577,12 +663,23 @@
     <div class="modal-overlay" id="infoModal" style="display:none;">
         <div class="modal-box">
             <h2>🧱 便签投稿墙</h2>
-            <p style="margin:12px 0;color:#9e8870;">拖动墙面探索 · 缩放查看 · 点击便签可拖动</p>
-            <ul>
-                <li><strong>缩放</strong>：滚轮 / 双指捏合 / 右下角滑块</li>
-                <li><strong>拖动</strong>：鼠标/单指拖动空白区域或便签</li>
-                <li><strong>投稿</strong>：编辑 notes-data.json 添加便签</li>
-            </ul>
+            <p style="margin:12px 0;color:#9e8870;font-size:0.95rem;">
+                这是一个开放的便签墙，每个人都可以贴上自己的想法、灵感、笔记。
+            </p>
+            <div style="margin:16px 0;padding:12px;background:rgba(201,168,108,0.1);border-radius:8px;">
+                <p style="margin:8px 0;"><strong>🎯 操作方式</strong></p>
+                <p style="margin:4px 0;font-size:0.9rem;">• 缩放：滚轮 / 双指捏合 / 右下角滑块</p>
+                <p style="margin:4px 0;font-size:0.9rem;">• 拖动：鼠标/单指拖动空白区或便签</p>
+                <p style="margin:4px 0;font-size:0.9rem;">• 搜索：右上角搜索图标</p>
+            </div>
+            <div style="margin:16px 0;padding:12px;background:rgba(201,168,108,0.05);border-radius:8px;">
+                <p style="margin:8px 0;"><strong>📝 如何投稿</strong></p>
+                <p style="margin:4px 0;font-size:0.9rem;">编辑 <code style="background:#f5e9d3;padding:2px 6px;border-radius:3px;">notes-data.json</code> 文件，添加你的便签</p>
+                <p style="margin:4px 0;font-size:0.9rem;">支持 Markdown、自定义颜色、图片背景</p>
+            </div>
+            <p style="margin:16px 0 8px;text-align:center;color:#8b6f47;font-size:0.85rem;">
+                © 熵 · 2026
+            </p>
             <button class="modal-close" id="closeModalBtn">开始探索 🚀</button>
         </div>
     </div>
@@ -666,11 +763,18 @@
                 return text.slice(0, i) + '…';
             }
 
-            // Markdown 渲染（带缓存）
+            // Markdown 渲染（带缓存，所有链接 target="_blank"）
             function renderMarkdown(text) {
                 if (typeof marked === 'undefined') return text;
                 if (!mdCache.has(text)) {
-                    try { mdCache.set(text, marked.parse(text)); } catch(e) { mdCache.set(text, text); }
+                    try { 
+                        const html = marked.parse(text);
+                        // 所有链接改为 target="_blank"
+                        const withTarget = html.replace(/<a href=/g, '<a target="_blank" rel="noopener noreferrer" href=');
+                        mdCache.set(text, withTarget);
+                    } catch(e) { 
+                        mdCache.set(text, text); 
+                    }
                 }
                 return mdCache.get(text);
             }
@@ -701,12 +805,12 @@
 
             function addNoteData(text, style, author) {
                 const id = `note-${allNotesData.length}`;
-                // 预分配位置（随机或网格，这里用随机）
                 const left = Math.random() * (WALL_WIDTH - 240) + 50;
                 const top  = Math.random() * (WALL_HEIGHT - 200) + 50;
                 const rotate = Math.random() * 10 - 5;
-                allNotesData.push({ id, text, style, author, left, top, rotate });
-                return id;
+                const noteData = { id, text, style, author, left, top, rotate };
+                allNotesData.push(noteData);
+                return noteData;  // 返回数据对象
             }
 
             function isInViewport(noteData) {
@@ -832,6 +936,7 @@
                 // ── 旋转 & 位置 ──
                 const rot = (rotate !== null) ? rotate : random(-5, 6);
                 note.style.transform = `rotate(${rot}deg)`;
+                note.dataset.rotate = rot;  // 保存旋转角度到 data 属性
                 const noteLeft = left !== null ? left : random(200, WALL_WIDTH - 200);
                 const noteTop  = top  !== null ? top  : random(200, WALL_HEIGHT - 200);
                 note.style.left = noteLeft + 'px';
@@ -896,8 +1001,9 @@
             function noteDragStart(note, clientX, clientY) {
                 dragNote = note;
                 dragStartX = clientX; dragStartY = clientY;
-                // 清除之前可能残留的 translate
-                note.style.transform = '';
+                // 保留旋转角度，只清除 translate
+                const rotate = note.dataset.rotate || 0;
+                note.style.transform = `rotate(${rotate}deg)`;
                 dragInitLeft  = parseFloat(note.style.left)  || 0;
                 dragInitTop   = parseFloat(note.style.top)   || 0;
                 dragLastX = clientX; dragLastY = clientY;
@@ -930,10 +1036,11 @@
                 dragRafId = requestAnimationFrame(() => {
                     if (dragNote) {
                         dragNote.style.transition = 'none';
-                        // translate 用相对偏移量，而非绝对位置
+                        // translate 用相对偏移量，同时保留旋转
                         const offsetX = newLeft - dragInitLeft;
                         const offsetY = newTop - dragInitTop;
-                        dragNote.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+                        const rotate = dragNote.dataset.rotate || 0;
+                        dragNote.style.transform = `translate(${offsetX}px, ${offsetY}px) rotate(${rotate}deg)`;
                     }
                 });
             }
@@ -973,10 +1080,11 @@
                 finalX = Math.min(WALL_WIDTH - 30, Math.max(-NOTE_W + 30, finalX));
                 finalY = Math.min(WALL_HEIGHT - 30, Math.max(-NOTE_H + 30, finalY));
 
-                // 写回 left/top，清除 translate，启用 transition 做平滑过渡
+                // 写回 left/top，清除 translate，恢复旋转
+                const rotate = note.dataset.rotate || 0;
                 note.style.left = finalX + 'px';
                 note.style.top  = finalY + 'px';
-                note.style.transform = '';
+                note.style.transform = `rotate(${rotate}deg)`;
                 // 显式启用 transition 实现粘滞效果
                 note.style.transition = 'left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), top 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
                 // 0.3s 后清除 transition，避免后续操作带动画
@@ -1030,16 +1138,32 @@
                 
                 const noteCount = data.notes.length;
                 
-                // 少量便签（≤50）：直接全部渲染，不启用虚拟滚动
+                // 收集所有便签数据用于搜索
+                allNotesForSearch = data.notes.map((item, i) => ({
+                    id: `note-${i}`,
+                    text: item.text,
+                    style: item.style || 'yellow',
+                    author: item.author || '',
+                    left: null,
+                    top: null
+                }));
+                
+                // 少量便签（≤50）：直接全部渲染
                 if (noteCount <= 50) {
                     const frag = document.createDocumentFragment();
-                    data.notes.forEach((item) => {
+                    data.notes.forEach((item, i) => {
                         const note = createNote(
                             item.text,
                             null, null, null,
                             item.style  || 'yellow',
                             item.author || ''
                         );
+                        note.dataset.noteId = `note-${i}`;
+                        // 保存位置用于搜索定位
+                        const left = parseFloat(note.style.left) || 0;
+                        const top = parseFloat(note.style.top) || 0;
+                        allNotesForSearch[i].left = left;
+                        allNotesForSearch[i].top = top;
                         frag.appendChild(note);
                     });
                     wall.appendChild(frag);
@@ -1049,12 +1173,17 @@
                 
                 // 大量便签（>50）：启用虚拟滚动
                 allNotesData = [];
-                data.notes.forEach((item) => {
-                    addNoteData(
+                data.notes.forEach((item, i) => {
+                    const noteData = addNoteData(
                         item.text,
                         item.style  || 'yellow',
                         item.author || ''
                     );
+                    // 同步位置信息
+                    if (noteData) {
+                        allNotesForSearch[i].left = noteData.left;
+                        allNotesForSearch[i].top = noteData.top;
+                    }
                 });
                 renderInBatches();
             }
@@ -1202,32 +1331,116 @@
 
             // 初始化：加载便签 → 渲染 → 滚动定位
             window.addEventListener('DOMContentLoaded', () => {
+            // ── 搜索功能 ──
+            let allNotesForSearch = [];  // 所有便签数据（用于搜索）
+            
+            function initSearch() {
+                const searchIcon = document.getElementById('searchIcon');
+                const searchPanel = document.getElementById('searchPanel');
+                const searchInput = document.getElementById('searchInput');
+                const searchResults = document.getElementById('searchResults');
+                
+                // 点击搜索图标切换面板
+                searchIcon?.addEventListener('click', () => {
+                    const isVisible = searchPanel.style.display === 'block';
+                    searchPanel.style.display = isVisible ? 'none' : 'block';
+                    if (!isVisible) {
+                        searchInput.focus();
+                    }
+                });
+                
+                // 点击外部关闭搜索面板
+                document.addEventListener('click', (e) => {
+                    if (!searchPanel?.contains(e.target) && e.target !== searchIcon && !searchIcon?.contains(e.target)) {
+                        searchPanel.style.display = 'none';
+                    }
+                });
+                
+                // 搜索输入
+                searchInput?.addEventListener('input', (e) => {
+                    const keyword = e.target.value.trim().toLowerCase();
+                    if (!keyword) {
+                        searchResults.innerHTML = '<div style="color:#9e8870;padding:20px;text-align:center">输入关键词搜索便签</div>';
+                        return;
+                    }
+                    
+                    // 搜索便签
+                    const matches = allNotesForSearch.filter(note => 
+                        note.text.toLowerCase().includes(keyword) || 
+                        (note.author && note.author.toLowerCase().includes(keyword))
+                    );
+                    
+                    if (matches.length === 0) {
+                        searchResults.innerHTML = '<div style="color:#9e8870;padding:20px;text-align:center">未找到匹配的便签</div>';
+                        return;
+                    }
+                    
+                    // 显示搜索结果
+                    searchResults.innerHTML = matches.slice(0, 20).map((note, i) => {
+                        const preview = note.text.replace(/[#*_~`>\[\]()]/g, '').slice(0, 80);
+                        return `
+                            <div class="search-result-item" data-note-id="${note.id || i}">
+                                <div class="result-text">${preview}${preview.length < note.text.length ? '...' : ''}</div>
+                                ${note.author ? `<div class="result-author">— ${note.author}</div>` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    // 点击结果定位到便签
+                    searchResults.querySelectorAll('.search-result-item').forEach((item, i) => {
+                        item.addEventListener('click', () => {
+                            const noteData = matches[i];
+                            if (noteData.left !== undefined && noteData.top !== undefined) {
+                                // 定位到便签位置
+                                const targetX = noteData.left - WALL_WIDTH / 2;
+                                const targetY = noteData.top - WALL_HEIGHT / 2;
+                                wallTranslateX = -targetX * currentScale;
+                                wallTranslateY = -targetY * currentScale;
+                                applyWallTransform(currentScale);
+                                searchPanel.style.display = 'none';
+                                
+                                // 高亮便签（如果已渲染）
+                                setTimeout(() => {
+                                    const noteEl = document.querySelector(`[data-note-id="${noteData.id}"]`);
+                                    if (noteEl && noteEl.classList.contains('note')) {
+                                        noteEl.style.animation = 'highlight 1s ease';
+                                        setTimeout(() => noteEl.style.animation = '', 1000);
+                                    }
+                                }, 300);
+                            }
+                        });
+                    });
+                });
+            }
+            
+            // 高亮动画CSS（添加到 head）
+            const highlightStyle = document.createElement('style');
+            highlightStyle.textContent = `
+                @keyframes highlight {
+                    0%, 100% { box-shadow: 6px 6px 15px rgba(0,0,0,0.4); }
+                    50% { box-shadow: 0 0 0 4px #ffd700, 6px 6px 15px rgba(0,0,0,0.4); }
+                }
+            `;
+            document.head.appendChild(highlightStyle);
+
+
                 console.log('🧱 便签墙初始化...');
                 makeWallDraggable();
                 initNoteDrag();
                 isolateZoomControl();
+                initSearch();
                 scrollToCenter();
                 console.log('✓ 墙面就绪');
-
-            // ── FPS 监控（可选）──
-            if (document.getElementById('fpsCounter')) {
-                document.getElementById('fpsCounter').style.display = 'block';
-                let lastTime = performance.now();
-                let frames = 0;
-                function updateFPS() {
-                    frames++;
-                    const now = performance.now();
-                    if (now - lastTime >= 1000) {
-                        const fps = Math.round(frames * 1000 / (now - lastTime));
-                        document.getElementById('fpsValue').textContent = fps;
-                        document.getElementById('noteCount').textContent = renderedNotes.size;
-                        frames = 0;
-                        lastTime = now;
-                    }
-                    requestAnimationFrame(updateFPS);
-                }
-                updateFPS();
-            }
+                
+                // 帮助图标点击事件
+                document.getElementById('helpIcon')?.addEventListener('click', () => {
+                    document.getElementById('infoModal').style.display = 'flex';
+                });
+                
+                // 关闭弹窗
+                document.getElementById('closeModalBtn')?.addEventListener('click', () => {
+                    document.getElementById('infoModal').style.display = 'none';
+                });
 
 
             });
@@ -1487,11 +1700,31 @@
     </script>
 
 
-    <!-- FPS 监控（可选，正式环境可删除） -->
-    <div id="fpsCounter" style="position:fixed; top:10px; left:10px; background:rgba(0,0,0,0.7); 
-         color:#7ec87e; padding:6px 12px; border-radius:6px; font-family:monospace; 
-         font-size:12px; z-index:30000; pointer-events:none; display:none;">
-        FPS: <span id="fpsValue">60</span> | 便签: <span id="noteCount">0</span>
+
+
+    <!-- 导航图标 -->
+    <a href="https://www.nekt.qzz.io" target="_blank" class="nav-icon home-icon" title="返回首页">
+        <svg viewBox="0 0 24 24">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </svg>
+    </a>
+    
+    <div class="nav-icon search-icon" id="searchIcon" title="搜索便签">
+        <svg viewBox="0 0 24 24">
+            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+    </div>
+    
+    <div class="nav-icon help-icon" id="helpIcon" title="关于">
+        <svg viewBox="0 0 24 24">
+            <path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/>
+        </svg>
+    </div>
+
+    <!-- 搜索面板 -->
+    <div class="search-panel" id="searchPanel">
+        <input type="text" id="searchInput" placeholder="搜索便签内容..." />
+        <div class="search-results" id="searchResults"></div>
     </div>
     <!-- 加载提示 -->
     <div id="loadingHint" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); 
