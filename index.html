@@ -55,7 +55,7 @@
             box-shadow: inset 0 0 0 4px #5a3f2e;
             transform-origin: center center;
             transform: translate3d(-50%, -50%, 0) scale(1);  /* translate3d 触发 GPU */
-            will-change: transform;
+            /* will-change 移除，减少闪烁 */
             cursor: grab;
             backface-visibility: hidden;  /* 强制 GPU 层 */
             -webkit-backface-visibility: hidden;
@@ -86,11 +86,10 @@
             cursor: grab;
             word-wrap: break-word;
             z-index: 1;
-            will-change: transform;  /* 改为 transform，拖动用 translate */
+            /* will-change 移除 */  /* 改为 transform，拖动用 translate */
             overflow: hidden;
             touch-action: none;
-            contain: layout style paint;  /* 完全隔离，避免影响其他便签 */
-            content-visibility: auto;     /* 浏览器自动优化不可见便签 */
+            contain: layout style;  /* 隔离布局和样式 */
         }
         
         /* 带图片背景的便签 */
@@ -400,8 +399,7 @@
             border: 2px solid #d4b57e;
         }
         .nav-icon:hover {
-            transform: scale(1.08);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            transform: scale(1.05) translateZ(0);  /* GPU 加速 */
             background: #fff;
         }
         .nav-icon svg {
@@ -418,13 +416,14 @@
             position: fixed;
             top: 70px;
             right: 16px;
+            transform: translateZ(0);  /* 独立合成层 */
             width: 320px;
             max-height: 400px;
             background: rgba(254,247,233,0.98);
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.2);
             padding: 16px;
-            z-index: 26000;
+            z-index: 30000;  /* 提高层级，避免被遮挡 */
             display: none;
             border: 2px solid #d4b57e;
         }
@@ -1128,8 +1127,16 @@
                 const searchInput = document.getElementById('searchInput');
                 const searchResults = document.getElementById('searchResults');
                 
+                if (!searchIcon || !searchPanel || !searchInput || !searchResults) {
+                    console.error('❌ 搜索元素未找到');
+                    return;
+                }
+                
+                console.log('✓ 搜索元素已找到，开始绑定事件');
+                
                 // 点击搜索图标切换面板
-                searchIcon?.addEventListener('click', () => {
+                searchIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();  // 阻止冒泡
                     const isVisible = searchPanel.style.display === 'block';
                     searchPanel.style.display = isVisible ? 'none' : 'block';
                     if (!isVisible) {
@@ -1139,9 +1146,16 @@
                 
                 // 点击外部关闭搜索面板
                 document.addEventListener('click', (e) => {
-                    if (!searchPanel?.contains(e.target) && e.target !== searchIcon && !searchIcon?.contains(e.target)) {
+                    if (!searchPanel.contains(e.target) && 
+                        e.target !== searchIcon && 
+                        !searchIcon.contains(e.target)) {
                         searchPanel.style.display = 'none';
                     }
+                });
+                
+                // 面板内点击不关闭
+                searchPanel.addEventListener('click', (e) => {
+                    e.stopPropagation();
                 });
                 
                 // 搜索输入
@@ -1216,13 +1230,16 @@
             document.head.appendChild(highlightStyle);
 
 
-                console.log('🧱 便签墙初始化...');
+                // console.log('🧱 便签墙初始化...'); // 已注释减少开销
                 makeWallDraggable();
                 initNoteDrag();
-                // isolateZoomControl(); // 滑块已移除
-                initSearch();
+                // 确保 DOM 完全就绪后再初始化搜索
+                setTimeout(() => {
+                    initSearch();
+                    // console.log('✓ 搜索功能已初始化'); // 已注释减少开销
+                }, 100);
                 scrollToCenter();
-                console.log('✓ 墙面就绪');
+                // console.log('✓ 墙面就绪'); // 已注释减少开销
                 
                 // 帮助图标点击事件
                 document.getElementById('helpIcon')?.addEventListener('click', () => {
@@ -1255,13 +1272,13 @@
                     
                     initDefaultNotes(data);
                     
-                    // 少量便签（≤50）立即关闭 loading
-                    if (noteCount <= 100) {
-                        setTimeout(() => {
-                            if (loading) loading.style.display = 'none';
-                        }, 200);
-                    }
-                    // 大量便签由 renderInBatches 关闭
+                    // 所有便签都直接渲染，统一关闭 loading
+                    setTimeout(() => {
+                        if (loading) {
+                            loading.style.display = 'none';
+                            console.log('✓ 加载完成，渲染了', noteCount, '张便签');
+                        }
+                    }, 300);
                 } catch (error) {
                     console.warn('加载便签数据失败:', error.message);
                     if (loadingText) loadingText.textContent = '⚠️ 加载失败，请检查 notes-data.json';
