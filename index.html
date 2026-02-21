@@ -994,6 +994,14 @@
                 });
                 wall.appendChild(frag);
                 console.log(`✓ 已渲染 ${noteCount} 张便签`);
+                console.log('📊 allNotesForSearch 数据量:', allNotesForSearch.length);
+                
+                // 暴露到全局便于调试
+                window.debugSearch = () => {
+                    console.log('allNotesForSearch:', allNotesForSearch);
+                    console.log('示例数据:', allNotesForSearch[0]);
+                };
+                console.log('💡 可在控制台运行 debugSearch() 查看搜索数据');
             }
 
             function renderInBatches() {
@@ -1159,22 +1167,36 @@
                 });
                 
                 // 搜索输入
-                searchInput?.addEventListener('input', (e) => {
+                searchInput.addEventListener('input', (e) => {
                     const keyword = e.target.value.trim().toLowerCase();
-                    console.log('🔍 搜索关键词:', keyword, '总便签数:', allNotesForSearch.length);
+                    console.log('🔍 搜索关键词:', keyword);
+                    console.log('📊 总便签数:', allNotesForSearch.length);
+                    
                     if (!keyword) {
                         searchResults.innerHTML = '<div style="color:#9e8870;padding:20px;text-align:center">输入关键词搜索便签</div>';
                         return;
+                    }
+                    
+                    // 调试：输出前3个便签内容
+                    if (allNotesForSearch.length > 0) {
+                        console.log('📝 前3个便签内容示例:');
+                        allNotesForSearch.slice(0, 3).forEach((note, i) => {
+                            console.log(`  [${i}]`, note.text?.slice(0, 50), '作者:', note.author);
+                        });
                     }
                     
                     // 搜索便签（内容和署名）
                     const matches = allNotesForSearch.filter(note => {
                         const text = (note.text || '').toLowerCase();
                         const author = (note.author || '').toLowerCase();
-                        return text.includes(keyword) || author.includes(keyword);
+                        const match = text.includes(keyword) || author.includes(keyword);
+                        if (match) {
+                            console.log('  ✓ 匹配:', note.text?.slice(0, 50));
+                        }
+                        return match;
                     });
                     
-                    console.log('✓ 找到', matches.length, '条匹配');
+                    console.log('✅ 找到', matches.length, '条匹配');
                     
                     if (matches.length === 0) {
                         searchResults.innerHTML = '<div style="color:#9e8870;padding:20px;text-align:center">未找到匹配的便签</div>';
@@ -1242,14 +1264,37 @@
                 // console.log('✓ 墙面就绪'); // 已注释减少开销
                 
                 // 帮助图标点击事件
-                document.getElementById('helpIcon')?.addEventListener('click', () => {
-                    document.getElementById('infoModal').style.display = 'flex';
-                });
+                const helpIcon = document.getElementById('helpIcon');
+                const infoModal = document.getElementById('infoModal');
+                
+                if (helpIcon && infoModal) {
+                    helpIcon.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        console.log('📖 打开帮助弹窗');
+                        infoModal.style.display = 'flex';
+                    });
+                    console.log('✓ 帮助图标事件已绑定');
+                } else {
+                    console.error('❌ 帮助元素未找到', {helpIcon, infoModal});
+                }
                 
                 // 关闭弹窗
-                document.getElementById('closeModalBtn')?.addEventListener('click', () => {
-                    document.getElementById('infoModal').style.display = 'none';
-                });
+                const closeBtn = document.getElementById('closeModalBtn');
+                if (closeBtn && infoModal) {
+                    closeBtn.addEventListener('click', () => {
+                        console.log('📖 关闭帮助弹窗');
+                        infoModal.style.display = 'none';
+                    });
+                    
+                    // 点击弹窗外部也关闭
+                    infoModal.addEventListener('click', (e) => {
+                        if (e.target === infoModal) {
+                            infoModal.style.display = 'none';
+                        }
+                    });
+                    
+                    console.log('✓ 关闭按钮事件已绑定');
+                }
 
 
             });
