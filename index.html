@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -498,7 +499,7 @@
     <!-- 缩放滑块 (右下角) -->
 
     <!-- 弹窗 (使用说明) -->
-    <div class="modal-overlay" id="infoModal" style="display:none;opacity:0;">
+    <div class="modal-overlay" id="infoModal" style="display:none;">
         <div class="modal-box">
             <h2>🧱 便签投稿墙</h2>
             <p style="margin:12px 0;color:#9e8870;font-size:0.95rem;">
@@ -619,17 +620,7 @@
 
             // marked 就绪后重新渲染（带缓存，避免重复解析）
             const mdCache = new Map();
-            const MAX_CACHE_SIZE = 500;
-            
-            // 配置 marked 支持换行
-            if (typeof marked !== 'undefined') {
-                marked.setOptions({
-                    breaks: true,  // 将 
- 转换为 <br>
-                    gfm: true      // GitHub Flavored Markdown
-                });
-            }
-            
+            const MAX_CACHE_SIZE = 500;  // 限制缓存大小防止内存溢出
             function rewireMarkdown() {
                 if (typeof marked === 'undefined') return;
                 document.querySelectorAll('.note-content[data-raw]').forEach(el => {
@@ -1195,17 +1186,13 @@
                         });
                     }
                     
-                    // 搜索便签（内容和署名，去除 Markdown 符号）
+                    // 搜索便签（内容和署名）
                     const matches = allNotesForSearch.filter(note => {
-                        // 去除 Markdown 符号后再搜索
-                        const cleanText = (note.text || '')
-                            .replace(/[*_~`#>]/g, '')  // 移除符号
-                            .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')  // 链接只保留文字
-                            .toLowerCase();
+                        const text = (note.text || '').toLowerCase();
                         const author = (note.author || '').toLowerCase();
-                        const match = cleanText.includes(keyword) || author.includes(keyword);
+                        const match = text.includes(keyword) || author.includes(keyword);
                         if (match) {
-                            console.log('  ✓ 匹配:', note.text?.slice(0, 60));
+                            console.log('  ✓ 匹配:', note.text?.slice(0, 50));
                         }
                         return match;
                     });
@@ -1286,7 +1273,6 @@
                         e.stopPropagation();
                         console.log('📖 打开帮助弹窗');
                         infoModal.style.display = 'flex';
-                        setTimeout(() => { infoModal.style.opacity = '1'; }, 10);
                     });
                     console.log('✓ 帮助图标事件已绑定');
                 } else {
@@ -1296,18 +1282,15 @@
                 // 关闭弹窗
                 const closeBtn = document.getElementById('closeModalBtn');
                 if (closeBtn && infoModal) {
-                    const closeModal = () => {
+                    closeBtn.addEventListener('click', () => {
                         console.log('📖 关闭帮助弹窗');
-                        infoModal.style.opacity = '0';
-                        setTimeout(() => { infoModal.style.display = 'none'; }, 200);
-                    };
-                    
-                    closeBtn.addEventListener('click', closeModal);
+                        infoModal.style.display = 'none';
+                    });
                     
                     // 点击弹窗外部也关闭
                     infoModal.addEventListener('click', (e) => {
                         if (e.target === infoModal) {
-                            closeModal();
+                            infoModal.style.display = 'none';
                         }
                     });
                     
@@ -1357,7 +1340,6 @@
                 // ── 鼠标拖动（桌面端）──
                 let mouseDown = false;
                 let mouseStartX, mouseStartY, mouseInitTX, mouseInitTY;
-                let mouseVX = 0, mouseVY = 0, mouseLastX = 0, mouseLastY = 0, mouseLastT = 0;
 
                 function onMouseDown(e) {
                     if (e.target === wall || e.target === wrapper) {
@@ -1368,29 +1350,17 @@
                         mouseStartY = e.clientY;
                         mouseInitTX = wallTranslateX;
                         mouseInitTY = wallTranslateY;
-                        mouseLastX = e.clientX;
-                        mouseLastY = e.clientY;
-                        mouseLastT = Date.now();
-                        mouseVX = 0; mouseVY = 0;
                         document.addEventListener('mousemove', onMouseMove);
                         document.addEventListener('mouseup', onMouseUp);
                     }
                 }
                 function onMouseMove(e) {
                     if (!mouseDown) return;
-                    // 计算速度
-                    const now = Date.now(), dt = now - mouseLastT;
-                    if (dt > 0) {
-                        mouseVX = (e.clientX - mouseLastX) / dt * 16;
-                        mouseVY = (e.clientY - mouseLastY) / dt * 16;
-                    }
-                    mouseLastX = e.clientX; mouseLastY = e.clientY; mouseLastT = now;
-                    
                     const dx = e.clientX - mouseStartX;
                     const dy = e.clientY - mouseStartY;
                     wallTranslateX = mouseInitTX + dx;
                     wallTranslateY = mouseInitTY + dy;
-                    
+                    // 限制范围
                     const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
                     const scaledW = WALL_WIDTH * currentScale, scaledH = WALL_HEIGHT * currentScale;
                     const maxX = Math.max(0, (scaledW - vw) / 2);
@@ -1403,19 +1373,6 @@
                     mouseDown = false;
                     document.removeEventListener('mousemove', onMouseMove);
                     document.removeEventListener('mouseup', onMouseUp);
-                    
-                    // 应用惯性（衰减系数 0.5）
-                    const finalX = wallTranslateX + mouseVX * 0.5;
-                    const finalY = wallTranslateY + mouseVY * 0.5;
-                    
-                    const vw = wrapper.clientWidth, vh = wrapper.clientHeight;
-                    const scaledW = WALL_WIDTH * currentScale, scaledH = WALL_HEIGHT * currentScale;
-                    const maxX = Math.max(0, (scaledW - vw) / 2);
-                    const maxY = Math.max(0, (scaledH - vh) / 2);
-                    
-                    wallTranslateX = Math.max(-maxX, Math.min(maxX, finalX));
-                    wallTranslateY = Math.max(-maxY, Math.min(maxY, finalY));
-                    applyWallTransform(currentScale);
                 }
                 wall.addEventListener('mousedown', onMouseDown);
                 wrapper.addEventListener('mousedown', onMouseDown);
@@ -1565,17 +1522,16 @@
 
             // 鼠标滚轮缩放（passive:false 允许 preventDefault，rAF 节流避免连续帧堆积）
             let wheelRafId = null;
-            let wheelRafId = null;
             wrapper.addEventListener('wheel', (e) => {
                 e.preventDefault();
                 cursorPos.x = e.clientX;
                 cursorPos.y = e.clientY;
                 const delta = e.deltaY > 0 ? -0.05 : 0.05;
                 let newScale = Math.max(0.2, Math.min(3, currentScale + delta));
-                
-                if (wheelRafId) return;
+                slider.value = newScale;
+                if (wheelRafId) return; // 上一帧还没处理完，跳过
                 wheelRafId = requestAnimationFrame(() => {
-                    updateZoom(newScale, true);  // 桌面端用光标跟随
+                    updateZoom(newScale, !mobileDevice);
                     wheelRafId = null;
                 });
             }, { passive: false });
